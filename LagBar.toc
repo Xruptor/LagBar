@@ -1,6 +1,6 @@
 ## Interface: 30300
 ## Title: LagBar
-## Author: Derkyle
+## Author: Xruptor
 ## Version:  1.5
 ## Notes: Displays a simple bar with some Latency Information.
 ## SavedVariables: LagBar_DB

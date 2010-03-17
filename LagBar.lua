@@ -1,4 +1,4 @@
---LagBar by Derkyle
+--LagBar by Xruptor
 
 LagBar = {};
 LagBar.version = GetAddOnMetadata("LagBar", "Version")
