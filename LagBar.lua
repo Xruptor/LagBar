@@ -1,6 +1,20 @@
 --LagBar by Xruptor
+local LagBar = CreateFrame("frame", "LagBar", UIParent)
 
-LagBar = {};
+LagBar:SetScript('OnEvent', function(self, event, ...)
+	if self[event] then
+		self[event](self, event, ...)
+	end
+end)
+
+if IsLoggedIn() then LagBar:PLAYER_LOGIN() else LagBar:RegisterEvent('PLAYER_LOGIN') end
+
+function LagBar:PLAYER_LOGIN()
+	LagBar:Enable()
+	self:UnregisterEvent("PLAYER_LOGIN")
+	self.PLAYER_LOGIN = nil
+end
+
 LagBar.version = GetAddOnMetadata("LagBar", "Version")
 LagBar.PL_Lock = false
 
@@ -112,7 +126,7 @@ function LagBar:DrawGUI()
 
 			end)
 			
-		lbFrame:SetScript("OnUpdate", function()
+		lbFrame:SetScript("OnUpdate", function(self, arg1)
 			
 				LagBar:OnUpdate(arg1);
 
