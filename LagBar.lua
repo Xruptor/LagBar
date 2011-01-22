@@ -108,62 +108,76 @@ function LagBar:DrawGUI()
 		lbFrame:SetBackdrop(nil);
 	end
 		
-		
-		
-		
 	lbFrame:RegisterForDrag("LeftButton")
 	lbFrame.text = lbFrame:CreateFontString("$parentText", "ARTWORK", "GameFontNormalSmall");
 	lbFrame.text:SetPoint("CENTER", lbFrame, "CENTER", 0, 0);
 	lbFrame.text:Show();
-			
+
 		
-		lbFrame:SetScript("OnLoad", function()
-
-			end)
-
-		lbFrame:SetScript("OnShow", function()
-
-
-			end)
+	lbFrame:SetScript("OnUpdate", function(self, arg1)
+		
+		if (LagBar.UPDATE_INTERVAL > 0) then
+			LagBar.UPDATE_INTERVAL = LagBar.UPDATE_INTERVAL - arg1;
+		else
+			LagBar.UPDATE_INTERVAL = LagBar.MAX_INTERVAL;
 			
-		lbFrame:SetScript("OnUpdate", function(self, arg1)
+			--local bandwidthIn, bandwidthOut, latency = GetNetStats();
+			--if (latency > LagBar_MEDIUM_LATENCY) then
+			--	LagBar_Text:SetTextColor(1, 0, 0);									
+			--elseif (latency > LagBar_LOW_LATENCY) then
+			--	LagBar_Text:SetTextColor(1, 1, 0);
+			--else
+			--	LagBar_Text:SetTextColor(0, 1, 0);
+			--end
+			--if (latency > 9999) then
+			--	LagBar_Text:SetText("Ping: HIGH");
+			--else
+			--	LagBar_Text:SetText("Ping: "..latency.." ms");
+			--end
+
+			local framerate = floor(GetFramerate() + 0.5)
+			local framerate_text = format("|cff%s%d|r fps", LagBar_GetThresholdHexColor(framerate / 60), framerate)
 			
-				LagBar:OnUpdate(arg1);
-
-			end)
-
-		lbFrame:SetScript("OnMouseDown", function(frame, button) 
+			local latency = select(3, GetNetStats())
+			local latency_text = format("|cff%s%d|r ms", LagBar_GetThresholdHexColor(latency, 1000, 500, 250, 100, 0), latency)
 			
-				if not LagBar_DB.locked and button ~= "RightButton" then
-					frame.isMoving = true
-					frame:StartMoving();
-				end
-			
-			end)
+			LagBarFrameText:SetText(framerate_text.." | "..latency_text);
+		end
 
-		lbFrame:SetScript("OnMouseUp", function(frame, button) 
+	end)
 
-				if not LagBar_DB.locked and button ~= "RightButton" then
-					if( frame.isMoving ) then
+	lbFrame:SetScript("OnMouseDown", function(frame, button) 
+		
+		if not LagBar_DB.locked and button ~= "RightButton" then
+			frame.isMoving = true
+			frame:StartMoving();
+		end
+		
+	end)
 
-						frame.isMoving = nil
-						frame:StopMovingOrSizing()
+	lbFrame:SetScript("OnMouseUp", function(frame, button) 
 
-						LagBar_DB.x, LagBar_DB.y = frame:GetCenter()
-					end
-				
-				elseif button == "RightButton" then
-				
-					if LagBar_DB.locked then
-						LagBar_DB.locked = false
-						DEFAULT_CHAT_FRAME:AddMessage("LagBar: Unlocked");
-					else
-						LagBar_DB.locked = true
-						DEFAULT_CHAT_FRAME:AddMessage("LagBar: Locked");
-					end
-				end
+		if not LagBar_DB.locked and button ~= "RightButton" then
+			if( frame.isMoving ) then
 
-			end)
+				frame.isMoving = nil
+				frame:StopMovingOrSizing()
+
+				LagBar_DB.x, LagBar_DB.y = frame:GetCenter()
+			end
+		
+		elseif button == "RightButton" then
+		
+			if LagBar_DB.locked then
+				LagBar_DB.locked = false
+				DEFAULT_CHAT_FRAME:AddMessage("LagBar: Unlocked");
+			else
+				LagBar_DB.locked = true
+				DEFAULT_CHAT_FRAME:AddMessage("LagBar: Locked");
+			end
+		end
+
+	end)
 			
 	LagBar.frame = lbFrame;
 
@@ -198,43 +212,10 @@ function LagBar:BackgroundToggle()
 	
 end
 
-function LagBar:OnUpdate(arg1)
-
-	if (LagBar.UPDATE_INTERVAL > 0) then
-		LagBar.UPDATE_INTERVAL = LagBar.UPDATE_INTERVAL - arg1;
-	else
-		LagBar.UPDATE_INTERVAL = LagBar.MAX_INTERVAL;
-		
-		--local bandwidthIn, bandwidthOut, latency = GetNetStats();
-		--if (latency > LagBar_MEDIUM_LATENCY) then
-		--	LagBar_Text:SetTextColor(1, 0, 0);									
-		--elseif (latency > LagBar_LOW_LATENCY) then
-		--	LagBar_Text:SetTextColor(1, 1, 0);
-		--else
-		--	LagBar_Text:SetTextColor(0, 1, 0);
-		--end
-		--if (latency > 9999) then
-		--	LagBar_Text:SetText("Ping: HIGH");
-		--else
-		--	LagBar_Text:SetText("Ping: "..latency.." ms");
-		--end
-
-		local framerate = floor(GetFramerate() + 0.5)
-		local framerate_text = format("|cff%s%d|r fps", LagBar_GetThresholdHexColor(framerate / 60), framerate)
-		
-		local latency = select(3, GetNetStats())
-		local latency_text = format("|cff%s%d|r ms", LagBar_GetThresholdHexColor(latency, 1000, 500, 250, 100, 0), latency)
-		
-		LagBarFrameText:SetText(framerate_text.." | "..latency_text);
-	end
-end
-
-
 function LagBar_GetThresholdHexColor(quality, ...)
 	local r, g, b = LagBar_GetThresholdColor(quality, ...)
 	return string.format("%02x%02x%02x", r*255, g*255, b*255)
 end
-
 
 function LagBar_GetThresholdColor(quality, ...)
 
