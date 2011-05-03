@@ -135,13 +135,28 @@ function LagBar:DrawGUI()
 			--	LagBar_Text:SetText("Ping: "..latency.." ms");
 			--end
 
+			--ORIGINAL CODE
+			-- local framerate = floor(GetFramerate() + 0.5)
+			-- local framerate_text = format("|cff%s%d|r fps", LagBar_GetThresholdHexColor(framerate / 60), framerate)
+			
+			-- local latency = select(3, GetNetStats())
+			-- local latency_text = format("|cff%s%d|r ms", LagBar_GetThresholdHexColor(latency, 1000, 500, 250, 100, 0), latency)
+			
+			-- LagBarFrameText:SetText(framerate_text.." | "..latency_text);
+			
+			
+			--thanks to comix1234 on wowinterface.com for the update.
 			local framerate = floor(GetFramerate() + 0.5)
 			local framerate_text = format("|cff%s%d|r fps", LagBar_GetThresholdHexColor(framerate / 60), framerate)
-			
-			local latency = select(3, GetNetStats())
-			local latency_text = format("|cff%s%d|r ms", LagBar_GetThresholdHexColor(latency, 1000, 500, 250, 100, 0), latency)
-			
-			LagBarFrameText:SetText(framerate_text.." | "..latency_text);
+						
+			local latencyHome = select(3, GetNetStats())
+			local latency_text = format("|cff%s%d|r ms", LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome)
+					
+			local latencyWorld = select(4, GetNetStats())
+			local latency_text_server = format("|cff%s%d|r ms", LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
+
+			LagBarFrameText:SetText(framerate_text.." | "..latency_text.." | "..latency_text_server);
+
 		end
 
 	end)
