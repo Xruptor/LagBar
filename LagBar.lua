@@ -32,12 +32,16 @@ function LagBar:Enable()
 		LagBar_DB.locked = false;
 		LagBar_DB.bgShown = true;
 	end
+	--lets do a toggle for world ping
+	if LagBar_DB and LagBar_DB.worldping == nil then
+		LagBar_DB.worldping = true
+	end
 
 	SLASH_LAGBAR1 = "/lagbar";
 	SlashCmdList["LAGBAR"] = LagBar_SlashCommand;
 
-	LagBar:DrawGUI();
-	LagBar:MoveFrame();
+	LagBar:DrawGUI()
+	LagBar:MoveFrame()
 end
 
 function LagBar:OnEvent(event, arg1, arg2, arg3, arg4, ...)
@@ -56,11 +60,17 @@ function LagBar_SlashCommand(cmd)
 		elseif cmd:lower() == "bg" then
 			LagBar:BackgroundToggle();
 			return nil;
+			
+		elseif cmd:lower() == "worldping" then
+			LagBar:WorldPingToggle();
+			return nil;
+			
 		end
 	end
 	DEFAULT_CHAT_FRAME:AddMessage("LagBar");
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar reset - resets the frame position");
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar bg - toggles the background on/off");
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar worldping - toggles world ping display on/off");
 end
 
 function LagBar:MoveFrame()
@@ -92,9 +102,15 @@ function LagBar:DrawGUI()
 	lbFrame:SetToplevel(true);
 	lbFrame:SetMovable(true);
 	lbFrame:SetFrameStrata("LOW");
-	lbFrame:SetWidth(120);
 	lbFrame:SetHeight(25);
 
+	--now change size according to worldping
+	if LagBar_DB.worldping then
+		LagBar.frame:SetWidth(120 + 30)
+	else
+		LagBar.frame:SetWidth(120)
+	end
+	
 
 	if LagBar_DB.bgShown then
 		local backdrop_header = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -155,8 +171,13 @@ function LagBar:DrawGUI()
 			local latencyWorld = select(4, GetNetStats())
 			local latency_text_server = format("|cff%s%d|r ms", LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
 
-			LagBarFrameText:SetText(framerate_text.." | "..latency_text.." | "..latency_text_server);
-
+			--change text according to worldping
+			if LagBar_DB.worldping then
+				LagBarFrameText:SetText(framerate_text.." | "..latency_text.." | "..latency_text_server)
+			else
+				LagBarFrameText:SetText(framerate_text.." | "..latency_text)
+			end
+	
 		end
 
 	end)
@@ -223,6 +244,28 @@ function LagBar:BackgroundToggle()
 		LagBar.frame:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
 	else
 		LagBar.frame:SetBackdrop(nil);
+	end
+	
+end
+
+function LagBar:WorldPingToggle()
+
+	if not LagBar_DB.worldping then
+		LagBar_DB.worldping = true
+		DEFAULT_CHAT_FRAME:AddMessage("LagBar: World ping is now displayed")
+	elseif LagBar_DB.worldping then
+		LagBar_DB.worldping = false
+		DEFAULT_CHAT_FRAME:AddMessage("LagBar: World ping is now hidden")
+	else
+		LagBar_DB.worldping = true
+		DEFAULT_CHAT_FRAME:AddMessage("LagBar: World ping is now displayed")
+	end
+
+	--now change size
+	if LagBar_DB.worldping then
+		LagBar.frame:SetWidth(120 + 30)
+	else
+		LagBar.frame:SetWidth(120)
 	end
 	
 end
