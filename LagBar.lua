@@ -106,9 +106,9 @@ function LagBar:DrawGUI()
 
 	--now change size according to worldping
 	if LagBar_DB.worldping then
-		LagBar.frame:SetWidth(120 + 30)
+		lbFrame:SetWidth(120 + 30)
 	else
-		LagBar.frame:SetWidth(120)
+		lbFrame:SetWidth(120)
 	end
 	
 
