@@ -37,11 +37,12 @@ function LagBar:Enable()
 		LagBar_DB.worldping = true
 	end
 
+	LagBar:DrawGUI()
+	LagBar:MoveFrame()
+	
 	SLASH_LAGBAR1 = "/lagbar";
 	SlashCmdList["LAGBAR"] = LagBar_SlashCommand;
 
-	LagBar:DrawGUI()
-	LagBar:MoveFrame()
 end
 
 function LagBar:OnEvent(event, arg1, arg2, arg3, arg4, ...)
@@ -214,8 +215,6 @@ function LagBar:DrawGUI()
 		end
 
 	end)
-			
-	LagBar.frame = lbFrame;
 
 end
 
@@ -233,17 +232,18 @@ function LagBar:BackgroundToggle()
 	end
 
 	--now change background
-	if LagBar_DB.bgShown and LagBar.frame then
+	if LagBar_DB.bgShown and LagBarFrame then
 		local backdrop_header = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile=1, tileSize=16, edgeSize = 16,
 				insets = {left = 5, right = 5, top = 5, bottom = 5}};
 
 
-		LagBar.frame:SetBackdrop(backdrop_header);
-		LagBar.frame:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
-		LagBar.frame:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
-	else
-		LagBar.frame:SetBackdrop(nil);
+		LagBarFrame:SetBackdrop(backdrop_header);
+		LagBarFrame:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
+		LagBarFrame:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
+		
+	elseif LagBarFrame then
+		LagBarFrame:SetBackdrop(nil)
 	end
 	
 end
@@ -262,10 +262,10 @@ function LagBar:WorldPingToggle()
 	end
 
 	--now change size
-	if LagBar_DB.worldping then
-		LagBar.frame:SetWidth(120 + 30)
-	else
-		LagBar.frame:SetWidth(120)
+	if LagBar_DB.worldping and LagBarFrame then
+		LagBarFrame:SetWidth(120 + 30)
+	elseif LagBarFrame then
+		LagBarFrame:SetWidth(120)
 	end
 	
 end
