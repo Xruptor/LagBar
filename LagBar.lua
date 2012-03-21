@@ -36,6 +36,10 @@ function LagBar:Enable()
 	if LagBar_DB and LagBar_DB.worldping == nil then
 		LagBar_DB.worldping = true
 	end
+	--lets do a toggle for improved display
+	if LagBar_DB and LagBar_DB.impdisplay == nil then
+		LagBar_DB.impdisplay = true
+	end
 
 	LagBar:DrawGUI()
 	LagBar:MoveFrame()
@@ -66,12 +70,17 @@ function LagBar_SlashCommand(cmd)
 			LagBar:WorldPingToggle();
 			return nil;
 			
+		elseif cmd:lower() == "impdisplay" then
+			LagBar:ImpDisplayToggle();
+			return nil;	
 		end
+		
 	end
 	DEFAULT_CHAT_FRAME:AddMessage("LagBar");
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar reset - resets the frame position");
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar bg - toggles the background on/off");
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar worldping - toggles world ping display on/off");
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar impdisplay - toggles improved world ping display");
 end
 
 function LagBar:MoveFrame()
@@ -107,7 +116,11 @@ function LagBar:DrawGUI()
 
 	--now change size according to worldping
 	if LagBar_DB.worldping then
-		lbFrame:SetWidth(120 + 30)
+		if LagBar_DB.impdisplay then
+			lbFrame:SetWidth(120 + 45)
+		else
+			lbFrame:SetWidth(120 + 30)
+		end
 	else
 		lbFrame:SetWidth(120)
 	end
@@ -174,7 +187,11 @@ function LagBar:DrawGUI()
 
 			--change text according to worldping
 			if LagBar_DB.worldping then
-				LagBarFrameText:SetText(framerate_text.." | "..latency_text.." | "..latency_text_server)
+				if LagBar_DB.impdisplay then
+					LagBarFrameText:SetText(framerate_text.." | |cFF99CC33H:|r"..latency_text.." | |cFF99CC33W:|r"..latency_text_server)
+				else
+					LagBarFrameText:SetText(framerate_text.." | "..latency_text.." | "..latency_text_server)
+				end
 			else
 				LagBarFrameText:SetText(framerate_text.." | "..latency_text)
 			end
@@ -263,9 +280,37 @@ function LagBar:WorldPingToggle()
 
 	--now change size
 	if LagBar_DB.worldping and LagBarFrame then
-		LagBarFrame:SetWidth(120 + 30)
+		if LagBar_DB.impdisplay then
+			LagBarFrame:SetWidth(120 + 45)
+		else
+			LagBarFrame:SetWidth(120 + 30)
+		end
 	elseif LagBarFrame then
 		LagBarFrame:SetWidth(120)
+	end
+	
+end
+
+function LagBar:ImpDisplayToggle()
+
+	if not LagBar_DB.impdisplay then
+		LagBar_DB.impdisplay = true
+		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Improved World Ping Display On")
+	elseif LagBar_DB.impdisplay then
+		LagBar_DB.impdisplay = false
+		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Improved World Ping Off")
+	else
+		LagBar_DB.impdisplay = true
+		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Improved World Ping On")
+	end
+
+	--now change size
+	if LagBar_DB.worldping and LagBarFrame then
+		if LagBar_DB.impdisplay then
+			LagBarFrame:SetWidth(120 + 45)
+		else
+			LagBarFrame:SetWidth(120 + 30)
+		end
 	end
 	
 end
