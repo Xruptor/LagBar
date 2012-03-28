@@ -114,18 +114,9 @@ function LagBar:DrawGUI()
 	lbFrame:SetFrameStrata("LOW");
 	lbFrame:SetHeight(25);
 
-	--now change size according to worldping
-	if LagBar_DB.worldping then
-		if LagBar_DB.impdisplay then
-			lbFrame:SetWidth(120 + 45)
-		else
-			lbFrame:SetWidth(120 + 30)
-		end
-	else
-		lbFrame:SetWidth(120)
-	end
+	--set to a small size to update size automaticall on first FPS grab
+	LagBarFrame:SetWidth(30)
 	
-
 	if LagBar_DB.bgShown then
 		local backdrop_header = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile=1, tileSize=16, edgeSize = 16,
@@ -195,7 +186,14 @@ function LagBar:DrawGUI()
 			else
 				LagBarFrameText:SetText(framerate_text.." | "..latency_text)
 			end
-	
+			
+			--check for overlapping text (JUST IN CASE)
+			if LagBarFrameText:GetStringWidth() > LagBarFrame:GetWidth() then
+				LagBarFrame:SetWidth(LagBarFrameText:GetStringWidth() + 20)
+			elseif (LagBarFrame:GetWidth() - LagBarFrameText:GetStringWidth()) > 41 then
+				LagBarFrame:SetWidth(LagBarFrameText:GetStringWidth() + 41)
+			end
+
 		end
 
 	end)
@@ -277,17 +275,6 @@ function LagBar:WorldPingToggle()
 		LagBar_DB.worldping = true
 		DEFAULT_CHAT_FRAME:AddMessage("LagBar: World ping is now displayed")
 	end
-
-	--now change size
-	if LagBar_DB.worldping and LagBarFrame then
-		if LagBar_DB.impdisplay then
-			LagBarFrame:SetWidth(120 + 45)
-		else
-			LagBarFrame:SetWidth(120 + 30)
-		end
-	elseif LagBarFrame then
-		LagBarFrame:SetWidth(120)
-	end
 	
 end
 
@@ -302,15 +289,6 @@ function LagBar:ImpDisplayToggle()
 	else
 		LagBar_DB.impdisplay = true
 		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Improved World Ping On")
-	end
-
-	--now change size
-	if LagBar_DB.worldping and LagBarFrame then
-		if LagBar_DB.impdisplay then
-			LagBarFrame:SetWidth(120 + 45)
-		else
-			LagBarFrame:SetWidth(120 + 30)
-		end
 	end
 	
 end
