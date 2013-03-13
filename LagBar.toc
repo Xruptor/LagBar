@@ -1,7 +1,7 @@
-## Interface: 50001
+## Interface: 50200
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  3.1
+## Version:  3.2
 ## Notes: Displays a simple bar with some Latency Information.
 ## SavedVariables: LagBar_DB
 LagBar.lua
