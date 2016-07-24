@@ -1,7 +1,8 @@
-## Interface: 60000
+## Interface: 70000
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  3.3
+## Version:  3.4
 ## Notes: Displays a simple bar with some Latency Information.
+## OptionalDeps: tekDebug
 ## SavedVariables: LagBar_DB
 LagBar.lua

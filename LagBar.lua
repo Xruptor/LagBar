@@ -7,6 +7,11 @@ LagBar:SetScript('OnEvent', function(self, event, ...)
 	end
 end)
 
+local debugf = tekDebug and tekDebug:GetFrame("LagBar")
+local function Debug(...)
+    if debugf then debugf:AddMessage(string.join(", ", tostringall(...))) end
+end
+
 if IsLoggedIn() then LagBar:PLAYER_LOGIN() else LagBar:RegisterEvent('PLAYER_LOGIN') end
 
 function LagBar:PLAYER_LOGIN()
@@ -118,13 +123,13 @@ function LagBar:DrawGUI()
 	LagBarFrame:SetWidth(30)
 	
 	if LagBar_DB.bgShown then
-		local backdrop_header = {bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+		local backdrop_header = {bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
 				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile=1, tileSize=16, edgeSize = 16,
 				insets = {left = 5, right = 5, top = 5, bottom = 5}};
 
 		lbFrame:SetBackdrop(backdrop_header);
-		lbFrame:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
-		lbFrame:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
+		lbFrame:SetBackdropBorderColor(0.5, 0.5, 0.5);
+		lbFrame:SetBackdropColor(0.5, 0.5, 0.5, 0.6)
 	else
 		lbFrame:SetBackdrop(nil);
 	end
