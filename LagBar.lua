@@ -31,11 +31,12 @@ LagBar.UPDATE_INTERVAL = 0
 function LagBar:Enable()
 
 	if not LagBar_DB then
-		LagBar_DB = {};
-		LagBar_DB.x = 0;
-		LagBar_DB.y = 0;
-		LagBar_DB.locked = false;
-		LagBar_DB.bgShown = true;
+		LagBar_DB = {}
+		LagBar_DB.x = 0
+		LagBar_DB.y = 0
+		LagBar_DB.locked = false
+		LagBar_DB.bgShown = true
+		LagBar_DB.scale = 1
 	end
 	--lets do a toggle for world ping
 	if LagBar_DB and LagBar_DB.worldping == nil then
@@ -44,6 +45,10 @@ function LagBar:Enable()
 	--lets do a toggle for improved display
 	if LagBar_DB and LagBar_DB.impdisplay == nil then
 		LagBar_DB.impdisplay = true
+	end
+	--lets check for scale
+	if LagBar_DB.scale == nil then
+		LagBar_DB.scale = 1
 	end
 
 	LagBar:DrawGUI()
@@ -61,31 +66,44 @@ function LagBar:OnEvent(event, arg1, arg2, arg3, arg4, ...)
 end
 
 function LagBar_SlashCommand(cmd)
-	if cmd and cmd ~= "" then
-		if cmd:lower() == "reset" then
+
+	local a,b,c=strfind(cmd, "(%S+)"); --contiguous string of non-space characters
+	
+	if a and a ~= "" then
+		if c and c:lower() == "reset" then
 			DEFAULT_CHAT_FRAME:AddMessage("LagBar: Frame position has been reset!");
 			LagBarFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
-	
+			
 			return nil;
-		elseif cmd:lower() == "bg" then
+		elseif c and c:lower() == "bg" then
 			LagBar:BackgroundToggle();
 			return nil;
 			
-		elseif cmd:lower() == "worldping" then
+		elseif c and c:lower() == "worldping" then
 			LagBar:WorldPingToggle();
 			return nil;
 			
-		elseif cmd:lower() == "impdisplay" then
+		elseif c and c:lower() == "impdisplay" then
 			LagBar:ImpDisplayToggle();
 			return nil;	
+		elseif c and c:lower() == "scale" then
+			if b then
+				local scalenum = strsub(cmd, b+2)
+				if scalenum and scalenum ~= "" and tonumber(scalenum) then
+					LagBar_DB.scale = tonumber(scalenum)
+					LagBarFrame:SetScale(tonumber(scalenum))
+					DEFAULT_CHAT_FRAME:AddMessage("LagBar: scale has been set to ["..tonumber(scalenum).."]")
+					return true
+				end
+			end
 		end
-		
 	end
 	DEFAULT_CHAT_FRAME:AddMessage("LagBar");
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar reset - resets the frame position");
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar bg - toggles the background on/off");
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar worldping - toggles world ping display on/off");
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar impdisplay - toggles improved world ping display");
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar scale # - Set the scale of the LagBar frame. Use small numbers like 0.5, 0.2, 1, 1.1, 1.5, etc..")
 end
 
 function LagBar:MoveFrame()
@@ -121,6 +139,9 @@ function LagBar:DrawGUI()
 
 	--set to a small size to update size automaticall on first FPS grab
 	LagBarFrame:SetWidth(30)
+	
+	--set the saved scale
+	LagBarFrame:SetScale(LagBar_DB.scale)
 	
 	if LagBar_DB.bgShown then
 		local backdrop_header = {bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
@@ -235,7 +256,7 @@ function LagBar:DrawGUI()
 		end
 
 	end)
-
+	
 end
 
 function LagBar:BackgroundToggle()
