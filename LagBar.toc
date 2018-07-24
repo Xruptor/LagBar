@@ -1,7 +1,7 @@
-## Interface: 70100
+## Interface: 80000
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  3.6
+## Version:  4.0
 ## Notes: Displays a simple bar with some Latency Information.
 ## OptionalDeps: tekDebug
 ## SavedVariables: LagBar_DB
