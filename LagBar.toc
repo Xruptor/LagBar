@@ -1,8 +1,17 @@
 ## Interface: 80000
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  4.0
+## Version:  4.1
+## X-Curse-Project-ID: 17487
+## X-WoWI-ID: 12373
 ## Notes: Displays a simple bar with some Latency Information.
 ## OptionalDeps: tekDebug
 ## SavedVariables: LagBar_DB
+
+libs\LibStub\LibStub.lua
+libs\AceLocale-3.0\AceLocale-3.0.xml
+
+locale\enUS.lua
+
 LagBar.lua
+config.lua

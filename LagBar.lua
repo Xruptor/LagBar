@@ -1,9 +1,16 @@
 --LagBar by Xruptor
 
-local f = CreateFrame("frame","LagBar",UIParent)
-f:SetScript("OnEvent", function(self, event, ...) if self[event] then return self[event](self, event, ...) end end)
+local ADDON_NAME, addon = ...
+if not _G[ADDON_NAME] then
+	_G[ADDON_NAME] = CreateFrame("Frame", ADDON_NAME, UIParent)
+end
+addon = _G[ADDON_NAME]
 
-local debugf = tekDebug and tekDebug:GetFrame("LagBar")
+local L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
+
+addon:SetScript("OnEvent", function(self, event, ...) if self[event] then return self[event](self, event, ...) end end)
+
+local debugf = tekDebug and tekDebug:GetFrame(ADDON_NAME)
 local function Debug(...)
     if debugf then debugf:AddMessage(string.join(", ", tostringall(...))) end
 end
@@ -96,23 +103,23 @@ end
 --      Enable      --
 ----------------------
 
-function f:PLAYER_LOGIN()
+function addon:PLAYER_LOGIN()
 
 	if not LagBar_DB then LagBar_DB = {} end
 	
-	if LagBar_DB.bgShown == nil then LagBar_DB.bgShown = 1 end
+	if LagBar_DB.bgShown == nil then LagBar_DB.bgShown = true end
 	if LagBar_DB.worldping == nil then LagBar_DB.worldping = true end
 	if LagBar_DB.impdisplay == nil then LagBar_DB.impdisplay = true end
 	if LagBar_DB.scale == nil then LagBar_DB.scale = 1 end
 
 	self:DrawGUI()
-	self:RestoreLayout("LagBar")
+	self:RestoreLayout(ADDON_NAME)
 	
 	SLASH_LAGBAR1 = "/lagbar";
 	SlashCmdList["LAGBAR"] = LagBar_SlashCommand;
 	
-	local ver = GetAddOnMetadata("LagBar","Version") or '1.0'
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("|cFF99CC33%s|r [v|cFFDF2B2B%s|r] Loaded", "LagBar", ver or "1.0"))
+	local ver = GetAddOnMetadata(ADDON_NAME,"Version") or '1.0'
+	DEFAULT_CHAT_FRAME:AddMessage(string.format("|cFF99CC33%s|r [v|cFF20ff20%s|r] loaded:   /lagbar", ADDON_NAME, ver or "1.0"))
 
 	self:UnregisterEvent("PLAYER_LOGIN")
 	self.PLAYER_LOGIN = nil
@@ -122,90 +129,87 @@ function LagBar_SlashCommand(cmd)
 
 	local a,b,c=strfind(cmd, "(%S+)"); --contiguous string of non-space characters
 	
-	if a and a ~= "" then
-		if c and c:lower() == "reset" then
-			DEFAULT_CHAT_FRAME:AddMessage("LagBar: Frame position has been reset!");
-			f:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
-			return nil;
-		elseif c and c:lower() == "bg" then
-			LagBar:BackgroundToggle();
-			return nil;
-			
-		elseif c and c:lower() == "worldping" then
-			LagBar:WorldPingToggle();
-			return nil;
-			
-		elseif c and c:lower() == "impdisplay" then
-			LagBar:ImpDisplayToggle();
-			return nil;	
-		elseif c and c:lower() == "scale" then
+	if a then
+		if c and c:lower() == L.SlashBG then
+			addon.aboutPanel.btnBG.func(true)
+			return true
+		elseif c and c:lower() == L.SlashReset then
+			addon.aboutPanel.btnReset.func()
+			return true
+		elseif c and c:lower() == L.SlashScale then
 			if b then
 				local scalenum = strsub(cmd, b+2)
-				if scalenum and scalenum ~= "" and tonumber(scalenum) then
-					LagBar_DB.scale = tonumber(scalenum)
-					f:SetScale(tonumber(scalenum))
-					DEFAULT_CHAT_FRAME:AddMessage("LagBar: scale has been set to ["..tonumber(scalenum).."]")
-					return true
+				if scalenum and scalenum ~= "" and tonumber(scalenum) and tonumber(scalenum) > 0 and tonumber(scalenum) <= 200 then
+					addon.aboutPanel.sliderScale.func(tonumber(scalenum))
+				else
+					DEFAULT_CHAT_FRAME:AddMessage(L.SlashScaleSetInvalid)
 				end
+				return true
 			end
+		elseif c and c:lower() == L.SlashWorldPing then
+			addon.aboutPanel.btnWorldPing.func(true)
+			return true
+		elseif c and c:lower() == L.SlashImpDisplay then
+			addon.aboutPanel.btnImpDisplay.func(true)
+			return true
 		end
 	end
-	DEFAULT_CHAT_FRAME:AddMessage("LagBar");
-	DEFAULT_CHAT_FRAME:AddMessage("To move the LagBar window, hold down SHIFT then drag to a new position.");
-	DEFAULT_CHAT_FRAME:AddMessage("/lagbar reset - resets the frame position");
-	DEFAULT_CHAT_FRAME:AddMessage("/lagbar bg - toggles the background on/off");
-	DEFAULT_CHAT_FRAME:AddMessage("/lagbar worldping - toggles world ping display on/off");
-	DEFAULT_CHAT_FRAME:AddMessage("/lagbar impdisplay - toggles improved world ping display");
-	DEFAULT_CHAT_FRAME:AddMessage("/lagbar scale # - Set the scale of the LagBar frame. Use small numbers like 0.5, 0.2, 1, 1.1, 1.5, etc..")
+	
+	DEFAULT_CHAT_FRAME:AddMessage(ADDON_NAME, 64/255, 224/255, 208/255)
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashReset.." - "..L.SlashResetInfo)
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashBG.." - "..L.SlashBGInfo)
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashWorldPing.." - "..L.SlashWorldPingInfo)
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashImpDisplay.." - "..L.SlashImpDisplayInfo)
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashScale.." # - "..L.SlashScaleInfo)
 end
 
-function f:DrawGUI()
+function addon:DrawGUI()
 
-	f:SetWidth(30)
-	f:SetHeight(25)
-	f:SetMovable(true)
-	f:SetClampedToScreen(true)
+	addon:SetWidth(30)
+	addon:SetHeight(25)
+	addon:SetMovable(true)
+	addon:SetClampedToScreen(true)
 	
-	f:SetScale(LagBar_DB.scale)
+	addon:SetScale(LagBar_DB.scale)
 	
 	if LagBar_DB.bgShown == 1 then
-		f:SetBackdrop( {
+		addon:SetBackdrop( {
 			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground";
 			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border";
 			tile = true; tileSize = 32; edgeSize = 16;
 			insets = { left = 5; right = 5; top = 5; bottom = 5; };
 		} );
-		f:SetBackdropBorderColor(0.5, 0.5, 0.5);
-		f:SetBackdropColor(0.5, 0.5, 0.5, 0.6)
+		addon:SetBackdropBorderColor(0.5, 0.5, 0.5);
+		addon:SetBackdropColor(0.5, 0.5, 0.5, 0.6)
 	else
-		f:SetBackdrop(nil)
+		addon:SetBackdrop(nil)
 	end
 	
-	f:EnableMouse(true)
+	addon:EnableMouse(true)
 	
-	local g = f:CreateFontString("$parentText", "ARTWORK", "GameFontNormalSmall")
+	local g = addon:CreateFontString("$parentText", "ARTWORK", "GameFontNormalSmall")
 	g:SetJustifyH("LEFT")
 	g:SetPoint("CENTER",0,0)
 	g:SetText("")
 
-	f:SetScript("OnMouseDown",function()
+	addon:SetScript("OnMouseDown",function()
 		if (IsShiftKeyDown()) then
 			self.isMoving = true
 			self:StartMoving();
 	 	end
 	end)
-	f:SetScript("OnMouseUp",function()
+	addon:SetScript("OnMouseUp",function()
 		if( self.isMoving ) then
 
 			self.isMoving = nil
 			self:StopMovingOrSizing()
 
-			f:SaveLayout(self:GetName());
+			addon:SaveLayout(ADDON_NAME)
 
 		end
 	end)
 
-	f:SetScript("OnUpdate", function(self, arg1)
+	addon:SetScript("OnUpdate", function(self, arg1)
 		
 		if (UPDATE_INTERVAL > 0) then
 			UPDATE_INTERVAL = UPDATE_INTERVAL - arg1
@@ -214,18 +218,18 @@ function f:DrawGUI()
 			
 			--thanks to comix1234 on wowinterface.com for the update.
 			local framerate = floor(GetFramerate() + 0.5)
-			local framerate_text = format("|cff%s%d|r fps", LagBar_GetThresholdHexColor(framerate / 60), framerate)
+			local framerate_text = format("|cff%s%d|r "..L.FPS, LagBar_GetThresholdHexColor(framerate / 60), framerate)
 						
 			local latencyHome = select(3, GetNetStats())
-			local latency_text = format("|cff%s%d|r ms", LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome)
+			local latency_text = format("|cff%s%d|r "..L.Milliseconds, LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome)
 					
 			local latencyWorld = select(4, GetNetStats())
-			local latency_text_server = format("|cff%s%d|r ms", LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
+			local latency_text_server = format("|cff%s%d|r "..L.Milliseconds, LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
 
 			--change text according to worldping
 			if LagBar_DB.worldping then
 				if LagBar_DB.impdisplay then
-					g:SetText(framerate_text.." | |cFF99CC33H:|r"..latency_text.." | |cFF99CC33W:|r"..latency_text_server)
+					g:SetText(framerate_text.." | |cFF99CC33"..L.Home..":|r"..latency_text.." | |cFF99CC33"..L.World..":|r"..latency_text_server)
 				else
 					g:SetText(framerate_text.." | "..latency_text.." | "..latency_text_server)
 				end
@@ -234,27 +238,43 @@ function f:DrawGUI()
 			end
 			
 			--check for overlapping text (JUST IN CASE)
-			if g:GetStringWidth() > f:GetWidth() then
-				f:SetWidth(g:GetStringWidth() + 20)
-			elseif (f:GetWidth() - g:GetStringWidth()) > 41 then
-				f:SetWidth(g:GetStringWidth() + 41)
+			if g:GetStringWidth() > addon:GetWidth() then
+				addon:SetWidth(g:GetStringWidth() + 20)
+			elseif (addon:GetWidth() - g:GetStringWidth()) > 41 then
+				addon:SetWidth(g:GetStringWidth() + 41)
 			end
 
 		end
 
 	end)
 	
-	f:Show()
+	addon:SetScript("OnLeave",function()
+		GameTooltip:Hide()
+	end)
+
+	addon:SetScript("OnEnter",function()
+	
+		GameTooltip:SetOwner(self, "ANCHOR_NONE")
+		GameTooltip:SetPoint(self:GetTipAnchor(self))
+		GameTooltip:ClearLines()
+
+		GameTooltip:AddLine(ADDON_NAME)
+		GameTooltip:AddLine(L.TooltipDragInfo, 64/255, 224/255, 208/255)
+		
+		GameTooltip:Show()
+	end)
+	
+	addon:Show()
 end
 
-function f:SaveLayout(frame)
+function addon:SaveLayout(frame)
 	if type(frame) ~= "string" then return end
 	if not _G[frame] then return end
 	if not LagBar_DB then LagBar_DB = {} end
 	
 	local opt = LagBar_DB[frame] or nil
 
-	if not opt then
+	if not opt or not opt.point or not opt.xOfs then
 		LagBar_DB[frame] = {
 			["point"] = "CENTER",
 			["relativePoint"] = "CENTER",
@@ -272,14 +292,14 @@ function f:SaveLayout(frame)
 	opt.yOfs = yOfs
 end
 
-function f:RestoreLayout(frame)
+function addon:RestoreLayout(frame)
 	if type(frame) ~= "string" then return end
 	if not _G[frame] then return end
 	if not LagBar_DB then LagBar_DB = {} end
 
 	local opt = LagBar_DB[frame] or nil
 
-	if not opt then
+	if not opt or not opt.point or not opt.xOfs then
 		LagBar_DB[frame] = {
 			["point"] = "CENTER",
 			["relativePoint"] = "CENTER",
@@ -293,67 +313,31 @@ function f:RestoreLayout(frame)
 	_G[frame]:SetPoint(opt.point, UIParent, opt.relativePoint, opt.xOfs, opt.yOfs)
 end
 
-function f:BackgroundToggle()
-	if not LagBar_DB then LagBar_DB = {} end
-	if LagBar_DB.bgShown == nil then LagBar_DB.bgShown = 1 end
-	
-	if LagBar_DB.bgShown == 0 then
-		LagBar_DB.bgShown = 1;
-		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Background Shown");
-	elseif LagBar_DB.bgShown == 1 then
-		LagBar_DB.bgShown = 0;
-		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Background Hidden");
-	else
-		LagBar_DB.bgShown = 1
-		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Background Shown");
-	end
-
-	--now change background
-	if LagBar_DB.bgShown == 1 then
-		f:SetBackdrop( {
+function addon:BackgroundToggle()
+	if LagBar_DB.bgShown then
+		addon:SetBackdrop( {
 			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground";
 			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border";
 			tile = true; tileSize = 32; edgeSize = 16;
 			insets = { left = 5; right = 5; top = 5; bottom = 5; };
 		} );
-		f:SetBackdropBorderColor(0.5, 0.5, 0.5);
-		f:SetBackdropColor(0.5, 0.5, 0.5, 0.6)
+		addon:SetBackdropBorderColor(0.5, 0.5, 0.5);
+		addon:SetBackdropColor(0.5, 0.5, 0.5, 0.6)
 	else
-		f:SetBackdrop(nil)
+		addon:SetBackdrop(nil)
 	end
-	
 end
 
-function f:WorldPingToggle()
-	if not LagBar_DB then LagBar_DB = {} end
-	
-	if not LagBar_DB.worldping then
-		LagBar_DB.worldping = true
-		DEFAULT_CHAT_FRAME:AddMessage("LagBar: World ping is now displayed")
-	elseif LagBar_DB.worldping then
-		LagBar_DB.worldping = false
-		DEFAULT_CHAT_FRAME:AddMessage("LagBar: World ping is now hidden")
-	else
-		LagBar_DB.worldping = true
-		DEFAULT_CHAT_FRAME:AddMessage("LagBar: World ping is now displayed")
-	end
-	
+------------------------
+--      Tooltip!      --
+------------------------
+
+function addon:GetTipAnchor(frame)
+	local x,y = frame:GetCenter()
+	if not x or not y then return "TOPLEFT", "BOTTOMLEFT" end
+	local hhalf = (x > UIParent:GetWidth()*2/3) and "RIGHT" or (x < UIParent:GetWidth()/3) and "LEFT" or ""
+	local vhalf = (y > UIParent:GetHeight()/2) and "TOP" or "BOTTOM"
+	return vhalf..hhalf, frame, (vhalf == "TOP" and "BOTTOM" or "TOP")..hhalf
 end
 
-function f:ImpDisplayToggle()
-	if not LagBar_DB then LagBar_DB = {} end
-	
-	if not LagBar_DB.impdisplay then
-		LagBar_DB.impdisplay = true
-		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Improved World Ping Display On")
-	elseif LagBar_DB.impdisplay then
-		LagBar_DB.impdisplay = false
-		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Improved World Ping Off")
-	else
-		LagBar_DB.impdisplay = true
-		DEFAULT_CHAT_FRAME:AddMessage("LagBar: Improved World Ping On")
-	end
-	
-end
-
-if IsLoggedIn() then f:PLAYER_LOGIN() else f:RegisterEvent("PLAYER_LOGIN") end
+if IsLoggedIn() then addon:PLAYER_LOGIN() else addon:RegisterEvent("PLAYER_LOGIN") end
