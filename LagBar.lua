@@ -111,6 +111,8 @@ function addon:PLAYER_LOGIN()
 	if LagBar_DB.worldping == nil then LagBar_DB.worldping = true end
 	if LagBar_DB.impdisplay == nil then LagBar_DB.impdisplay = true end
 	if LagBar_DB.scale == nil then LagBar_DB.scale = 1 end
+	if LagBar_DB.fps == nil then LagBar_DB.fps = true end
+	if LagBar_DB.homeping == nil then LagBar_DB.homeping = true end
 
 	self:DrawGUI()
 	self:RestoreLayout(ADDON_NAME)
@@ -149,6 +151,12 @@ function LagBar_SlashCommand(cmd)
 		elseif c and c:lower() == L.SlashWorldPing then
 			addon.aboutPanel.btnWorldPing.func(true)
 			return true
+		elseif c and c:lower() == L.SlashFPS then
+			addon.aboutPanel.btnFPS.func(true)
+			return true
+		elseif c and c:lower() == L.SlashHomePing then
+			addon.aboutPanel.btnHomePing.func(true)
+			return true
 		elseif c and c:lower() == L.SlashImpDisplay then
 			addon.aboutPanel.btnImpDisplay.func(true)
 			return true
@@ -158,6 +166,8 @@ function LagBar_SlashCommand(cmd)
 	DEFAULT_CHAT_FRAME:AddMessage(ADDON_NAME, 64/255, 224/255, 208/255)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashReset.." - "..L.SlashResetInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashBG.." - "..L.SlashBGInfo)
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashFPS.." - "..L.SlashFPSInfo)
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashHomePing.." - "..L.SlashHomePingInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashWorldPing.." - "..L.SlashWorldPingInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashImpDisplay.." - "..L.SlashImpDisplayInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashScale.." # - "..L.SlashScaleInfo)
@@ -216,26 +226,60 @@ function addon:DrawGUI()
 		else
 			UPDATE_INTERVAL = MAX_INTERVAL;
 			
+			local finalText = ""
+			
 			--thanks to comix1234 on wowinterface.com for the update.
 			local framerate = floor(GetFramerate() + 0.5)
 			local framerate_text = format("|cff%s%d|r "..L.FPS, LagBar_GetThresholdHexColor(framerate / 60), framerate)
-						
+			
+			if not LagBar_DB.fps then
+				framerate_text = ""
+			end
+			
 			local latencyHome = select(3, GetNetStats())
 			local latency_text = format("|cff%s%d|r "..L.Milliseconds, LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome)
-					
+				
+			if not LagBar_DB.homeping then
+				latency_text = ""
+			end
+			
 			local latencyWorld = select(4, GetNetStats())
 			local latency_text_server = format("|cff%s%d|r "..L.Milliseconds, LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
 
-			--change text according to worldping
+			if not LagBar_DB.worldping then
+				latency_text_server = ""
+			end
+			
+			
+			if LagBar_DB.fps and (LagBar_DB.homeping or LagBar_DB.worldping) then
+				finalText = framerate_text.." | "
+			else
+				finalText = framerate_text
+			end
+			
+			if LagBar_DB.homeping and LagBar_DB.worldping then
+				if LagBar_DB.impdisplay then
+					finalText = finalText.."|cFF99CC33"..L.Home..":|r"..latency_text.." | "
+				else
+					finalText = finalText..latency_text.." | "
+				end
+			elseif LagBar_DB.homeping then
+				if LagBar_DB.impdisplay then
+					finalText = finalText.."|cFF99CC33"..L.Home..":|r"..latency_text
+				else
+					finalText = finalText..latency_text
+				end
+			end
+			
 			if LagBar_DB.worldping then
 				if LagBar_DB.impdisplay then
-					g:SetText(framerate_text.." | |cFF99CC33"..L.Home..":|r"..latency_text.." | |cFF99CC33"..L.World..":|r"..latency_text_server)
+					finalText = finalText.."|cFF99CC33"..L.World..":|r"..latency_text_server
 				else
-					g:SetText(framerate_text.." | "..latency_text.." | "..latency_text_server)
+					finalText = finalText..latency_text_server
 				end
-			else
-				g:SetText(framerate_text.." | "..latency_text)
 			end
+			
+			g:SetText(finalText)
 			
 			--check for overlapping text (JUST IN CASE)
 			if g:GetStringWidth() > addon:GetWidth() then

@@ -203,6 +203,44 @@ function configEvent:PLAYER_LOGIN()
 	addConfigEntry(sliderScale, 0, -40)
 	addon.aboutPanel.sliderScale = sliderScale
 	
+	local btnFPS = createCheckbutton(addon.aboutPanel, L.SlashFPSChkBtn)
+	btnFPS:SetScript("OnShow", function() btnFPS:SetChecked(LagBar_DB.fps) end)
+	btnFPS.func = function(slashSwitch)
+		local value = LagBar_DB.fps
+		if not slashSwitch then value = btnFPS:GetChecked() end
+
+		if value then
+			LagBar_DB.fps = false
+			DEFAULT_CHAT_FRAME:AddMessage(L.SlashFPSOff)
+		else
+			LagBar_DB.fps = true
+			DEFAULT_CHAT_FRAME:AddMessage(L.SlashFPSOn)
+		end
+	end
+	btnFPS:SetScript("OnClick", btnFPS.func)
+	
+	addConfigEntry(btnFPS, 0, -35)
+	addon.aboutPanel.btnFPS = btnFPS
+	
+	local btnHomePing = createCheckbutton(addon.aboutPanel, L.SlashHomePingChkBtn)
+	btnHomePing:SetScript("OnShow", function() btnHomePing:SetChecked(LagBar_DB.homeping) end)
+	btnHomePing.func = function(slashSwitch)
+		local value = LagBar_DB.homeping
+		if not slashSwitch then value = btnHomePing:GetChecked() end
+
+		if value then
+			LagBar_DB.homeping = false
+			DEFAULT_CHAT_FRAME:AddMessage(L.SlashHomePingOff)
+		else
+			LagBar_DB.homeping = true
+			DEFAULT_CHAT_FRAME:AddMessage(L.SlashHomePingOn)
+		end
+	end
+	btnHomePing:SetScript("OnClick", btnHomePing.func)
+	
+	addConfigEntry(btnHomePing, 0, -20)
+	addon.aboutPanel.btnHomePing = btnHomePing
+	
 	local btnWorldPing = createCheckbutton(addon.aboutPanel, L.SlashWorldPingChkBtn)
 	btnWorldPing:SetScript("OnShow", function() btnWorldPing:SetChecked(LagBar_DB.worldping) end)
 	btnWorldPing.func = function(slashSwitch)
@@ -219,7 +257,7 @@ function configEvent:PLAYER_LOGIN()
 	end
 	btnWorldPing:SetScript("OnClick", btnWorldPing.func)
 	
-	addConfigEntry(btnWorldPing, 0, -35)
+	addConfigEntry(btnWorldPing, 0, -20)
 	addon.aboutPanel.btnWorldPing = btnWorldPing
 	
 	local btnImpDisplay = createCheckbutton(addon.aboutPanel, L.SlashImpDisplayChkBtn)

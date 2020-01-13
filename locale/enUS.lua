@@ -18,6 +18,18 @@ L.SlashScaleSetInvalid = "LagBar: scale invalid or number cannot be greater than
 L.SlashScaleInfo = "Set the scale of the LagBar frame (0-200)"
 L.SlashScaleText = "LagBar Frame Scale"
 
+L.SlashFPS = "fps"
+L.SlashFPSOn = "LagBar: FPS is now [|cFF99CC33ON|r]"
+L.SlashFPSOff = "LagBar: FPS is now [|cFF99CC33OFF|r]"
+L.SlashFPSInfo = "Toggles fps display (|cFF99CC33ON/OFF|r)."
+L.SlashFPSChkBtn = "Show the fps display."
+
+L.SlashHomePing = "homeping"
+L.SlashHomePingOn = "LagBar: HomePing is now [|cFF99CC33ON|r]"
+L.SlashHomePingOff = "LagBar: HomePing is now [|cFF99CC33OFF|r]"
+L.SlashHomePingInfo = "Toggles home ping display (|cFF99CC33ON/OFF|r)."
+L.SlashHomePingChkBtn = "Show the home ping display."
+
 L.SlashWorldPing = "worldping"
 L.SlashWorldPingOn = "LagBar: WorldPing is now [|cFF99CC33ON|r]"
 L.SlashWorldPingOff = "LagBar: WorldPing is now [|cFF99CC33OFF|r]"
@@ -25,10 +37,10 @@ L.SlashWorldPingInfo = "Toggles world ping display (|cFF99CC33ON/OFF|r)."
 L.SlashWorldPingChkBtn = "Show the world ping display."
 
 L.SlashImpDisplay = "impdisplay"
-L.SlashImpDisplayOn = "LagBar: Improved WorldPing is now [|cFF99CC33ON|r]"
-L.SlashImpDisplayOff = "LagBar: Improved WorldPing is now [|cFF99CC33OFF|r]"
-L.SlashImpDisplayInfo = "Toggles improved world ping display (|cFF99CC33ON/OFF|r)."
-L.SlashImpDisplayChkBtn = "Show the improved world ping display."
+L.SlashImpDisplayOn = "LagBar: Improved Ping Display is now [|cFF99CC33ON|r]"
+L.SlashImpDisplayOff = "LagBar: Improved Ping Display is now [|cFF99CC33OFF|r]"
+L.SlashImpDisplayInfo = "Toggles improved ping display (|cFF99CC33ON/OFF|r)."
+L.SlashImpDisplayChkBtn = "Show the improved ping display."
 
 L.TooltipDragInfo = "[Hold Shift and Drag to move window.]"
 L.FPS = "fps"
