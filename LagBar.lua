@@ -117,6 +117,8 @@ function addon:PLAYER_LOGIN()
 	self:DrawGUI()
 	self:RestoreLayout(ADDON_NAME)
 	
+	self:BackgroundToggle()
+	
 	SLASH_LAGBAR1 = "/lagbar";
 	SlashCmdList["LAGBAR"] = LagBar_SlashCommand;
 	
