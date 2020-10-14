@@ -1,10 +1,10 @@
 local ADDON_NAME, addon = ...
 if not _G[ADDON_NAME] then
-	_G[ADDON_NAME] = CreateFrame("Frame", ADDON_NAME, UIParent)
+	_G[ADDON_NAME] = CreateFrame("Frame", ADDON_NAME, UIParent, BackdropTemplateMixin and "BackdropTemplate")
 end
 addon = _G[ADDON_NAME]
 
-addon.configEvent = CreateFrame("frame", ADDON_NAME.."_config_eventFrame",UIParent)
+addon.configEvent = CreateFrame("frame", ADDON_NAME.."_config_eventFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 local configEvent = addon.configEvent
 configEvent:SetScript("OnEvent", function(self, event, ...) if self[event] then return self[event](self, event, ...) end end)
 
@@ -57,7 +57,7 @@ local function createSlider(parentFrame, displayText, minVal, maxVal)
 		insets = { left = 3, right = 3, top = 6, bottom = 6 }
 	}
 	
-	local slider = CreateFrame("Slider", ADDON_NAME.."_config_slider_" .. sliderIndex, parentFrame)
+	local slider = CreateFrame("Slider", ADDON_NAME.."_config_slider_" .. sliderIndex, parentFrame, BackdropTemplateMixin and "BackdropTemplate")
 	slider:SetOrientation("HORIZONTAL")
 	slider:SetHeight(15)
 	slider:SetWidth(300)
@@ -92,7 +92,7 @@ end
 local function LoadAboutFrame()
 
 	--Code inspired from tekKonfigAboutPanel
-	local about = CreateFrame("Frame", ADDON_NAME.."AboutPanel", InterfaceOptionsFramePanelContainer)
+	local about = CreateFrame("Frame", ADDON_NAME.."AboutPanel", InterfaceOptionsFramePanelContainer, BackdropTemplateMixin and "BackdropTemplate")
 	about.name = ADDON_NAME
 	about:Hide()
 	

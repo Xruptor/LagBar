@@ -2,7 +2,7 @@
 
 local ADDON_NAME, addon = ...
 if not _G[ADDON_NAME] then
-	_G[ADDON_NAME] = CreateFrame("Frame", ADDON_NAME, UIParent)
+	_G[ADDON_NAME] = CreateFrame("Frame", ADDON_NAME, UIParent, BackdropTemplateMixin and "BackdropTemplate")
 end
 addon = _G[ADDON_NAME]
 
