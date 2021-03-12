@@ -1,12 +1,12 @@
 #@retail@
-## Interface: 90001
+## Interface: 90005
 #@end-retail@
 #@non-retail@
-# ## Interface: 11305
+# ## Interface: 11306
 #@end-non-retail@
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  4.8
+## Version:  4.9
 ## X-Curse-Project-ID: 17487
 ## X-WoWI-ID: 12373
 ## Notes: Displays a simple bar with some Latency Information.
