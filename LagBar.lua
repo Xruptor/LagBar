@@ -8,12 +8,32 @@ addon = _G[ADDON_NAME]
 
 local L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 
-addon:SetScript("OnEvent", function(self, event, ...) if self[event] then return self[event](self, event, ...) end end)
-
 local debugf = tekDebug and tekDebug:GetFrame(ADDON_NAME)
 local function Debug(...)
     if debugf then debugf:AddMessage(string.join(", ", tostringall(...))) end
 end
+
+addon:RegisterEvent("ADDON_LOADED")
+addon:SetScript("OnEvent", function(self, event, ...)
+	if event == "ADDON_LOADED" or event == "PLAYER_LOGIN" then
+		if event == "ADDON_LOADED" then
+			local arg1 = ...
+			if arg1 and arg1 == ADDON_NAME then
+				self:UnregisterEvent("ADDON_LOADED")
+				self:RegisterEvent("PLAYER_LOGIN")
+			end
+			return
+		end
+		if IsLoggedIn() then
+			self:EnableAddon(event, ...)
+			self:UnregisterEvent("PLAYER_LOGIN")
+		end
+		return
+	end
+	if self[event] then
+		return self[event](self, event, ...)
+	end
+end)
 
 local MAX_INTERVAL = 1
 local UPDATE_INTERVAL = 0
@@ -103,7 +123,7 @@ end
 --      Enable      --
 ----------------------
 
-function addon:PLAYER_LOGIN()
+function addon:EnableAddon()
 
 	if not LagBar_DB then LagBar_DB = {} end
 	
@@ -122,11 +142,10 @@ function addon:PLAYER_LOGIN()
 	SLASH_LAGBAR1 = "/lagbar";
 	SlashCmdList["LAGBAR"] = LagBar_SlashCommand;
 	
+	if addon.configFrame then addon.configFrame:EnableConfig() end
+	
 	local ver = GetAddOnMetadata(ADDON_NAME,"Version") or '1.0'
 	DEFAULT_CHAT_FRAME:AddMessage(string.format("|cFF99CC33%s|r [v|cFF20ff20%s|r] loaded:   /lagbar", ADDON_NAME, ver or "1.0"))
-
-	self:UnregisterEvent("PLAYER_LOGIN")
-	self.PLAYER_LOGIN = nil
 end
 
 function LagBar_SlashCommand(cmd)
@@ -385,5 +404,3 @@ function addon:GetTipAnchor(frame)
 	local vhalf = (y > UIParent:GetHeight()/2) and "TOP" or "BOTTOM"
 	return vhalf..hhalf, frame, (vhalf == "TOP" and "BOTTOM" or "TOP")..hhalf
 end
-
-if IsLoggedIn() then addon:PLAYER_LOGIN() else addon:RegisterEvent("PLAYER_LOGIN") end
