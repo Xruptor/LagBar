@@ -147,7 +147,7 @@ function configFrame:EnableConfig()
 	btnBG:SetScript("OnShow", function() btnBG:SetChecked(LagBar_DB.bgShown) end)
 	btnBG.func = function(slashSwitch)
 		local value = LagBar_DB.bgShown
-		if not slashSwitch then value = btnBG:GetChecked() end
+		if not slashSwitch then value = LagBar_DB.bgShown end
 
 		if value then
 			LagBar_DB.bgShown = false
@@ -206,7 +206,7 @@ function configFrame:EnableConfig()
 	btnFPS:SetScript("OnShow", function() btnFPS:SetChecked(LagBar_DB.fps) end)
 	btnFPS.func = function(slashSwitch)
 		local value = LagBar_DB.fps
-		if not slashSwitch then value = btnFPS:GetChecked() end
+		if not slashSwitch then value = LagBar_DB.fps end
 
 		if value then
 			LagBar_DB.fps = false
@@ -225,7 +225,7 @@ function configFrame:EnableConfig()
 	btnHomePing:SetScript("OnShow", function() btnHomePing:SetChecked(LagBar_DB.homeping) end)
 	btnHomePing.func = function(slashSwitch)
 		local value = LagBar_DB.homeping
-		if not slashSwitch then value = btnHomePing:GetChecked() end
+		if not slashSwitch then value = LagBar_DB.homeping end
 
 		if value then
 			LagBar_DB.homeping = false
@@ -244,7 +244,7 @@ function configFrame:EnableConfig()
 	btnWorldPing:SetScript("OnShow", function() btnWorldPing:SetChecked(LagBar_DB.worldping) end)
 	btnWorldPing.func = function(slashSwitch)
 		local value = LagBar_DB.worldping
-		if not slashSwitch then value = btnWorldPing:GetChecked() end
+		if not slashSwitch then value = LagBar_DB.worldping end
 
 		if value then
 			LagBar_DB.worldping = false
@@ -263,7 +263,7 @@ function configFrame:EnableConfig()
 	btnImpDisplay:SetScript("OnShow", function() btnImpDisplay:SetChecked(LagBar_DB.impdisplay) end)
 	btnImpDisplay.func = function(slashSwitch)
 		local value = LagBar_DB.impdisplay
-		if not slashSwitch then value = btnImpDisplay:GetChecked() end
+		if not slashSwitch then value = LagBar_DB.impdisplay end
 
 		if value then
 			LagBar_DB.impdisplay = false
