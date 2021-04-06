@@ -6,7 +6,7 @@
 #@end-non-retail@
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  5.1
+## Version:  5.2
 ## X-Curse-Project-ID: 17487
 ## X-WoWI-ID: 12373
 ## Notes: Displays a simple bar with some Latency Information.
