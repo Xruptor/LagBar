@@ -164,6 +164,26 @@ function configFrame:EnableConfig()
 	addConfigEntry(btnBG, 0, -20)
 	addon.aboutPanel.btnBG = btnBG
 	
+	--show tooltip
+	local btnTT = createCheckbutton(addon.aboutPanel, L.SlashTTInfo)
+	btnTT:SetScript("OnShow", function() btnTT:SetChecked(LagBar_DB.ttShown) end)
+	btnTT.func = function(slashSwitch)
+		local value = LagBar_DB.ttShown
+		if not slashSwitch then value = LagBar_DB.ttShown end
+
+		if value then
+			LagBar_DB.ttShown = false
+			DEFAULT_CHAT_FRAME:AddMessage(L.SlashTTOff)
+		else
+			LagBar_DB.ttShown = true
+			DEFAULT_CHAT_FRAME:AddMessage(L.SlashTTOn)
+		end		
+	end
+	btnTT:SetScript("OnClick", btnTT.func)
+	
+	addConfigEntry(btnTT, 0, -25)
+	addon.aboutPanel.btnTT = btnTT
+	
 	--reset
 	local btnReset = createButton(addon.aboutPanel, L.SlashResetInfo)
 	btnReset.func = function()
