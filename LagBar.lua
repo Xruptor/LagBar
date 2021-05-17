@@ -128,6 +128,7 @@ function addon:EnableAddon()
 	if not LagBar_DB then LagBar_DB = {} end
 	
 	if LagBar_DB.bgShown == nil then LagBar_DB.bgShown = true end
+	if LagBar_DB.ttShown == nil then LagBar_DB.ttShown = true end
 	if LagBar_DB.worldping == nil then LagBar_DB.worldping = true end
 	if LagBar_DB.impdisplay == nil then LagBar_DB.impdisplay = true end
 	if LagBar_DB.scale == nil then LagBar_DB.scale = 1 end
@@ -155,6 +156,9 @@ function LagBar_SlashCommand(cmd)
 	if a then
 		if c and c:lower() == L.SlashBG then
 			addon.aboutPanel.btnBG.func(true)
+			return true
+		elseif c and c:lower() == L.SlashTT then
+			addon.aboutPanel.btnTT.func()
 			return true
 		elseif c and c:lower() == L.SlashReset then
 			addon.aboutPanel.btnReset.func()
@@ -187,6 +191,7 @@ function LagBar_SlashCommand(cmd)
 	DEFAULT_CHAT_FRAME:AddMessage(ADDON_NAME, 64/255, 224/255, 208/255)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashReset.." - "..L.SlashResetInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashBG.." - "..L.SlashBGInfo)
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashTT.." - "..L.SlashTTInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashFPS.." - "..L.SlashFPSInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashHomePing.." - "..L.SlashHomePingInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashWorldPing.." - "..L.SlashWorldPingInfo)
@@ -323,8 +328,11 @@ function addon:DrawGUI()
 		GameTooltip:SetPoint(self:GetTipAnchor(self))
 		GameTooltip:ClearLines()
 
-		GameTooltip:AddLine(ADDON_NAME)
-		GameTooltip:AddLine(L.TooltipDragInfo, 64/255, 224/255, 208/255)
+		
+		if LagBar_DB.ttShown then
+			GameTooltip:AddLine(ADDON_NAME)
+			GameTooltip:AddLine(L.TooltipDragInfo, 64/255, 224/255, 208/255)	
+		end	
 		
 		GameTooltip:Show()
 	end)

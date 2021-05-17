@@ -8,6 +8,11 @@ L.SlashBGOn = "LagBar: Background is now [|cFF99CC33SHOWN|r]"
 L.SlashBGOff = "LagBar: Background is now [|cFF99CC33HIDDEN|r]"
 L.SlashBGInfo = "Show the window background."
 
+L.SlashTT = "tt"
+L.SlashTTOn = "LagBar: Hover Tooltip is now [|cFF99CC33SHOWN|r]"
+L.SlashTTOff = "LagBar: Hover Tooltip is now [|cFF99CC33HIDDEN|r]"
+L.SlashTTInfo = "Show the Tooltip when hovering over data."
+
 L.SlashReset = "reset"
 L.SlashResetInfo = "Reset frame position."
 L.SlashResetAlert = "LagBar: Frame position has been reset!"
