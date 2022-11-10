@@ -4,9 +4,10 @@
 ## Interface-Wrath: 30400
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  5.7
+## Version:  5.9
 ## X-Curse-Project-ID: 17487
 ## X-WoWI-ID: 12373
+## X-Wago-ID: 0mKOyZNx
 ## Notes: Displays a simple bar with some Latency Information.
 ## OptionalDeps: tekDebug
 ## SavedVariables: LagBar_DB
