@@ -92,11 +92,14 @@ local function LagBar_GetThresholdPercentage(quality, ...)
 	end
 end
 
+--check for infinite
+local function isINF(value)
+  return value == math.huge or value == -math.huge
+end
+
 local function LagBar_GetThresholdColor(quality, ...)
 
-	local inf = 1/0
-	
-	if quality ~= quality or quality == inf or quality == -inf then
+	if quality ~= quality or isINF(quality) then
 		return 1, 1, 1
 	end
 
