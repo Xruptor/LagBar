@@ -137,6 +137,7 @@ function addon:EnableAddon()
 	if LagBar_DB.scale == nil then LagBar_DB.scale = 1 end
 	if LagBar_DB.fps == nil then LagBar_DB.fps = true end
 	if LagBar_DB.homeping == nil then LagBar_DB.homeping = true end
+	if LagBar_DB.metric == nil then LagBar_DB.metric = true end
 
 	self:DrawGUI()
 	self:RestoreLayout(ADDON_NAME)
@@ -188,9 +189,12 @@ function LagBar_SlashCommand(cmd)
 		elseif c and c:lower() == L.SlashImpDisplay then
 			addon.aboutPanel.btnImpDisplay.func(true)
 			return true
+		elseif c and c:lower() == L.SlashMetricLabels then
+			addon.aboutPanel.btnMetricLabels.func(true)
+			return true
 		end
 	end
-	
+
 	DEFAULT_CHAT_FRAME:AddMessage(ADDON_NAME, 64/255, 224/255, 208/255)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashReset.." - "..L.SlashResetInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashBG.." - "..L.SlashBGInfo)
@@ -199,6 +203,7 @@ function LagBar_SlashCommand(cmd)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashHomePing.." - "..L.SlashHomePingInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashWorldPing.." - "..L.SlashWorldPingInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashImpDisplay.." - "..L.SlashImpDisplayInfo)
+	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashMetricLabels.." - "..L.SlashMetricLabelsInfo)
 	DEFAULT_CHAT_FRAME:AddMessage("/lagbar "..L.SlashScale.." # - "..L.SlashScaleInfo)
 end
 
@@ -256,24 +261,29 @@ function addon:DrawGUI()
 			UPDATE_INTERVAL = MAX_INTERVAL;
 			
 			local finalText = ""
+			local metric
 			
+			
+			if LagBar_DB.metric then metric = L.FPS else metric = "" end
 			--thanks to comix1234 on wowinterface.com for the update.
 			local framerate = floor(GetFramerate() + 0.5)
-			local framerate_text = format("|cff%s%d|r "..L.FPS, LagBar_GetThresholdHexColor(framerate / 60), framerate)
+			local framerate_text = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(framerate / 60), framerate)
 			
 			if not LagBar_DB.fps then
 				framerate_text = ""
 			end
 			
+			if LagBar_DB.metric then metric = L.Milliseconds else metric = "" end
 			local latencyHome = select(3, GetNetStats())
-			local latency_text = format("|cff%s%d|r "..L.Milliseconds, LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome)
+			local latency_text = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome)
 				
 			if not LagBar_DB.homeping then
 				latency_text = ""
 			end
 			
+			if LagBar_DB.metric then metric = L.Milliseconds else metric = "" end
 			local latencyWorld = select(4, GetNetStats())
-			local latency_text_server = format("|cff%s%d|r "..L.Milliseconds, LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
+			local latency_text_server = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
 
 			if not LagBar_DB.worldping then
 				latency_text_server = ""

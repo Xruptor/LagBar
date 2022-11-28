@@ -297,4 +297,24 @@ function configFrame:EnableConfig()
 	
 	addConfigEntry(btnImpDisplay, 0, -20)
 	addon.aboutPanel.btnImpDisplay = btnImpDisplay
+	
+	local btnMetricLabels = createCheckbutton(addon.aboutPanel, L.SlashMetricLabelsChkBtn)
+	btnMetricLabels:SetScript("OnShow", function() btnMetricLabels:SetChecked(LagBar_DB.metric) end)
+	btnMetricLabels.func = function(slashSwitch)
+		local value = LagBar_DB.metric
+		if not slashSwitch then value = LagBar_DB.metric end
+
+		if value then
+			LagBar_DB.metric = false
+			DEFAULT_CHAT_FRAME:AddMessage(L.SlashMetricLabelsOff)
+		else
+			LagBar_DB.metric = true
+			DEFAULT_CHAT_FRAME:AddMessage(L.SlashMetricLabelsOn)
+		end
+	end
+	btnMetricLabels:SetScript("OnClick", btnMetricLabels.func)
+	
+	addConfigEntry(btnMetricLabels, 0, -20)
+	addon.aboutPanel.btnMetricLabels = btnMetricLabels
+	
 end

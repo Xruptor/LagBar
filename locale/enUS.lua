@@ -47,6 +47,12 @@ L.SlashImpDisplayOff = "LagBar: Improved Ping Display is now [|cFF99CC33OFF|r]"
 L.SlashImpDisplayInfo = "Toggles improved ping display (|cFF99CC33ON/OFF|r)."
 L.SlashImpDisplayChkBtn = "Show the improved ping display."
 
+L.SlashMetricLabels = "metric"
+L.SlashMetricLabelsOn = "LagBar: Metric labels are now [|cFF99CC33ON|r]"
+L.SlashMetricLabelsOff = "LagBar: Metric labels are now [|cFF99CC33OFF|r]"
+L.SlashMetricLabelsInfo = "Toggles the display of metric labels (|cFF99CC33ON/OFF|r)."
+L.SlashMetricLabelsChkBtn = "Show metric labels in display."
+
 L.TooltipDragInfo = "[Hold Shift and Drag to move window.]"
 L.FPS = "fps"
 L.Milliseconds = "ms"
