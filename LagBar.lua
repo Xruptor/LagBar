@@ -38,6 +38,8 @@ end)
 local MAX_INTERVAL = 1
 local UPDATE_INTERVAL = 0
 
+local lagBarTooltip = CreateFrame("GameTooltip", "LagBarTooltip", UIParent, "GameTooltipTemplate")
+
 ----------------------
 -- Color Functions  --
 ----------------------
@@ -332,22 +334,21 @@ function addon:DrawGUI()
 	end)
 	
 	addon:SetScript("OnLeave",function()
-		GameTooltip:Hide()
+		lagBarTooltip:Hide()
 	end)
 
 	addon:SetScript("OnEnter",function()
 	
-		GameTooltip:SetOwner(self, "ANCHOR_NONE")
-		GameTooltip:SetPoint(self:GetTipAnchor(self))
-		GameTooltip:ClearLines()
+		lagBarTooltip:SetOwner(self, "ANCHOR_TOP")
+		lagBarTooltip:SetPoint(self:GetTipAnchor(addon))
+		lagBarTooltip:ClearLines()
 
-		
 		if LagBar_DB.ttShown then
-			GameTooltip:AddLine(ADDON_NAME)
-			GameTooltip:AddLine(L.TooltipDragInfo, 64/255, 224/255, 208/255)	
+			lagBarTooltip:AddLine(ADDON_NAME)
+			lagBarTooltip:AddLine(L.TooltipDragInfo, 64/255, 224/255, 208/255)	
 		end	
 		
-		GameTooltip:Show()
+		lagBarTooltip:Show()
 	end)
 	
 	addon:Show()
