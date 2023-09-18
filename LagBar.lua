@@ -131,7 +131,7 @@ end
 function addon:EnableAddon()
 
 	if not LagBar_DB then LagBar_DB = {} end
-	
+
 	if LagBar_DB.bgShown == nil then LagBar_DB.bgShown = true end
 	if LagBar_DB.ttShown == nil then LagBar_DB.ttShown = true end
 	if LagBar_DB.worldping == nil then LagBar_DB.worldping = true end
@@ -143,14 +143,14 @@ function addon:EnableAddon()
 
 	self:DrawGUI()
 	self:RestoreLayout(ADDON_NAME)
-	
+
 	self:BackgroundToggle()
-	
+
 	SLASH_LAGBAR1 = "/lagbar";
 	SlashCmdList["LAGBAR"] = LagBar_SlashCommand;
-	
+
 	if addon.configFrame then addon.configFrame:EnableConfig() end
-	
+
 	local ver = GetAddOnMetadata(ADDON_NAME,"Version") or '1.0'
 	DEFAULT_CHAT_FRAME:AddMessage(string.format("|cFF99CC33%s|r [v|cFF20ff20%s|r] loaded:   /lagbar", ADDON_NAME, ver or "1.0"))
 end
@@ -158,7 +158,7 @@ end
 function LagBar_SlashCommand(cmd)
 
 	local a,b,c=strfind(cmd, "(%S+)"); --contiguous string of non-space characters
-	
+
 	if a then
 		if c and c:lower() == L.SlashBG then
 			addon.aboutPanel.btnBG.func(true)
@@ -172,8 +172,8 @@ function LagBar_SlashCommand(cmd)
 		elseif c and c:lower() == L.SlashScale then
 			if b then
 				local scalenum = strsub(cmd, b+2)
-				if scalenum and scalenum ~= "" and tonumber(scalenum) and tonumber(scalenum) > 0 and tonumber(scalenum) <= 200 then
-					addon.aboutPanel.sliderScale.func(tonumber(scalenum))
+				if scalenum and scalenum ~= "" and tonumber(scalenum) and tonumber(scalenum) >= 0.5 and tonumber(scalenum) <= 5 then
+					addon:SetAddonScale(tonumber(scalenum))
 				else
 					DEFAULT_CHAT_FRAME:AddMessage(L.SlashScaleSetInvalid)
 				end
@@ -215,9 +215,9 @@ function addon:DrawGUI()
 	addon:SetHeight(25)
 	addon:SetMovable(true)
 	addon:SetClampedToScreen(true)
-	
-	addon:SetScale(LagBar_DB.scale)
-	
+
+	addon:SetAddonScale(LagBar_DB.scale, true)
+
 	if LagBar_DB.bgShown == 1 then
 		addon:SetBackdrop( {
 			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground";
@@ -230,9 +230,9 @@ function addon:DrawGUI()
 	else
 		addon:SetBackdrop(nil)
 	end
-	
+
 	addon:EnableMouse(true)
-	
+
 	local g = addon:CreateFontString("$parentText", "ARTWORK", "GameFontNormalSmall")
 	g:SetJustifyH("LEFT")
 	g:SetPoint("CENTER",0,0)
@@ -256,33 +256,33 @@ function addon:DrawGUI()
 	end)
 
 	addon:SetScript("OnUpdate", function(self, arg1)
-		
+
 		if (UPDATE_INTERVAL > 0) then
 			UPDATE_INTERVAL = UPDATE_INTERVAL - arg1
 		else
 			UPDATE_INTERVAL = MAX_INTERVAL;
-			
+
 			local finalText = ""
 			local metric
-			
-			
+
+
 			if LagBar_DB.metric then metric = L.FPS else metric = "" end
 			--thanks to comix1234 on wowinterface.com for the update.
 			local framerate = floor(GetFramerate() + 0.5)
 			local framerate_text = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(framerate / 60), framerate)
-			
+
 			if not LagBar_DB.fps then
 				framerate_text = ""
 			end
-			
+
 			if LagBar_DB.metric then metric = L.Milliseconds else metric = "" end
 			local latencyHome = select(3, GetNetStats())
 			local latency_text = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome)
-				
+
 			if not LagBar_DB.homeping then
 				latency_text = ""
 			end
-			
+
 			if LagBar_DB.metric then metric = L.Milliseconds else metric = "" end
 			local latencyWorld = select(4, GetNetStats())
 			local latency_text_server = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
@@ -290,14 +290,14 @@ function addon:DrawGUI()
 			if not LagBar_DB.worldping then
 				latency_text_server = ""
 			end
-			
-			
+
+
 			if LagBar_DB.fps and (LagBar_DB.homeping or LagBar_DB.worldping) then
 				finalText = framerate_text.." | "
 			else
 				finalText = framerate_text
 			end
-			
+
 			if LagBar_DB.homeping and LagBar_DB.worldping then
 				if LagBar_DB.impdisplay then
 					finalText = finalText.."|cFF99CC33"..L.Home..":|r"..latency_text.." | "
@@ -311,7 +311,7 @@ function addon:DrawGUI()
 					finalText = finalText..latency_text
 				end
 			end
-			
+
 			if LagBar_DB.worldping then
 				if LagBar_DB.impdisplay then
 					finalText = finalText.."|cFF99CC33"..L.World..":|r"..latency_text_server
@@ -319,9 +319,9 @@ function addon:DrawGUI()
 					finalText = finalText..latency_text_server
 				end
 			end
-			
+
 			g:SetText(finalText)
-			
+
 			--check for overlapping text (JUST IN CASE)
 			if g:GetStringWidth() > addon:GetWidth() then
 				addon:SetWidth(g:GetStringWidth() + 20)
@@ -332,33 +332,46 @@ function addon:DrawGUI()
 		end
 
 	end)
-	
+
 	addon:SetScript("OnLeave",function()
 		lagBarTooltip:Hide()
 	end)
 
 	addon:SetScript("OnEnter",function()
-	
+
 		lagBarTooltip:SetOwner(self, "ANCHOR_TOP")
 		lagBarTooltip:SetPoint(self:GetTipAnchor(addon))
 		lagBarTooltip:ClearLines()
 
 		if LagBar_DB.ttShown then
 			lagBarTooltip:AddLine(ADDON_NAME)
-			lagBarTooltip:AddLine(L.TooltipDragInfo, 64/255, 224/255, 208/255)	
-		end	
-		
+			lagBarTooltip:AddLine(L.TooltipDragInfo, 64/255, 224/255, 208/255)
+		end
+
 		lagBarTooltip:Show()
 	end)
-	
+
 	addon:Show()
+end
+
+function addon:SetAddonScale(value, bypass) 
+	--fix this in case it's ever smaller than   
+	if value < 0.5 then value = 0.5 end --anything smaller and it would vanish  
+	if value > 5 then value = 5 end --WAY too big  
+ 
+	LagBar_DB.scale = value 
+ 
+	if not bypass then 
+		DEFAULT_CHAT_FRAME:AddMessage(string.format(L.SlashScaleSet, value)) 
+	end 
+	addon:SetScale(LagBar_DB.scale) 
 end
 
 function addon:SaveLayout(frame)
 	if type(frame) ~= "string" then return end
 	if not _G[frame] then return end
 	if not LagBar_DB then LagBar_DB = {} end
-	
+
 	local opt = LagBar_DB[frame] or nil
 
 	if not opt or not opt.point or not opt.xOfs then
