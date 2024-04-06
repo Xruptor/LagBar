@@ -140,6 +140,7 @@ function addon:EnableAddon()
 	if LagBar_DB.fps == nil then LagBar_DB.fps = true end
 	if LagBar_DB.homeping == nil then LagBar_DB.homeping = true end
 	if LagBar_DB.metric == nil then LagBar_DB.metric = true end
+	if LagBar_DB.clampToScreen == nil then LagBar_DB.clampToScreen = true end
 
 	self:DrawGUI()
 	self:RestoreLayout(ADDON_NAME)
@@ -214,7 +215,7 @@ function addon:DrawGUI()
 	addon:SetWidth(30)
 	addon:SetHeight(25)
 	addon:SetMovable(true)
-	addon:SetClampedToScreen(true)
+	addon:SetClampedToScreen(LagBar_DB.clampToScreen)
 
 	addon:SetAddonScale(LagBar_DB.scale, true)
 

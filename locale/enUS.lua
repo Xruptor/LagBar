@@ -53,6 +53,8 @@ L.SlashMetricLabelsOff = "LagBar: Metric labels are now [|cFF99CC33OFF|r]"
 L.SlashMetricLabelsInfo = "Toggles the display of metric labels (|cFF99CC33ON/OFF|r)."
 L.SlashMetricLabelsChkBtn = "Show metric labels in display."
 
+L.SlashClampToScreenChkBtn = "Clamp the LagBar frame to the screen. |cFF99CC33(Prevents being dragged off screen)|r"
+
 L.TooltipDragInfo = "[Hold Shift and Drag to move window.]"
 L.FPS = "fps"
 L.Milliseconds = "ms"

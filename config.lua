@@ -11,32 +11,32 @@ local L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 
 local lastObject
 local function addConfigEntry(objEntry, adjustX, adjustY)
-	
+
 	objEntry:ClearAllPoints()
-	
+
 	if not lastObject then
 		objEntry:SetPoint("TOPLEFT", 20, -150)
 	else
 		objEntry:SetPoint("LEFT", lastObject, "BOTTOMLEFT", adjustX or 0, adjustY or -30)
 	end
-	
+
 	lastObject = objEntry
 end
 
 local chkBoxIndex = 0
 local function createCheckbutton(parentFrame, displayText)
 	chkBoxIndex = chkBoxIndex + 1
-	
+
 	local checkbutton = CreateFrame("CheckButton", ADDON_NAME.."_config_chkbtn_" .. chkBoxIndex, parentFrame, "ChatConfigCheckButtonTemplate")
 	getglobal(checkbutton:GetName() .. 'Text'):SetText(" "..displayText)
-	
+
 	return checkbutton
 end
 
 local buttonIndex = 0
 local function createButton(parentFrame, displayText)
 	buttonIndex = buttonIndex + 1
-	
+
 	local button = CreateFrame("Button", ADDON_NAME.."_config_button_" .. buttonIndex, parentFrame, "UIPanelButtonTemplate")
 	button:SetText(displayText)
 	button:SetHeight(30)
@@ -95,7 +95,7 @@ local function LoadAboutFrame()
 	local about = CreateFrame("Frame", ADDON_NAME.."AboutPanel", InterfaceOptionsFramePanelContainer, BackdropTemplateMixin and "BackdropTemplate")
 	about.name = ADDON_NAME
 	about:Hide()
-	
+
     local fields = {"Version", "Author"}
 	local notes = GetAddOnMetadata(ADDON_NAME, "Notes")
 
@@ -133,16 +133,16 @@ local function LoadAboutFrame()
 			anchor = title
 		end
 	end
-	
+
 	InterfaceOptions_AddCategory(about)
 
 	return about
 end
 
 function configFrame:EnableConfig()
-	
+
 	addon.aboutPanel = LoadAboutFrame()
-	
+
 	--bg shown
 	local btnBG = createCheckbutton(addon.aboutPanel, L.SlashBGInfo)
 	btnBG:SetScript("OnShow", function() btnBG:SetChecked(LagBar_DB.bgShown) end)
@@ -157,14 +157,14 @@ function configFrame:EnableConfig()
 			LagBar_DB.bgShown = true
 			DEFAULT_CHAT_FRAME:AddMessage(L.SlashBGOn)
 		end
-		
+
 		addon:BackgroundToggle()
 	end
 	btnBG:SetScript("OnClick", btnBG.func)
-	
+
 	addConfigEntry(btnBG, 0, -20)
 	addon.aboutPanel.btnBG = btnBG
-	
+
 	--show tooltip
 	local btnTT = createCheckbutton(addon.aboutPanel, L.SlashTTInfo)
 	btnTT:SetScript("OnShow", function() btnTT:SetChecked(LagBar_DB.ttShown) end)
@@ -178,13 +178,13 @@ function configFrame:EnableConfig()
 		else
 			LagBar_DB.ttShown = true
 			DEFAULT_CHAT_FRAME:AddMessage(L.SlashTTOn)
-		end		
+		end
 	end
 	btnTT:SetScript("OnClick", btnTT.func)
-	
+
 	addConfigEntry(btnTT, 0, -25)
 	addon.aboutPanel.btnTT = btnTT
-	
+
 	--reset
 	local btnReset = createButton(addon.aboutPanel, L.SlashResetInfo)
 	btnReset.func = function()
@@ -193,10 +193,10 @@ function configFrame:EnableConfig()
 		addon:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 	end
 	btnReset:SetScript("OnClick", btnReset.func)
-	
+
 	addConfigEntry(btnReset, 0, -30)
 	addon.aboutPanel.btnReset = btnReset
-	
+
 	--scale
 	local sliderScale = createSlider(addon.aboutPanel, L.SlashScaleText, 0.5, 5, 0.1)
 	sliderScale:SetScript("OnShow", function()
@@ -235,10 +235,10 @@ function configFrame:EnableConfig()
 		end
 	end
 	btnFPS:SetScript("OnClick", btnFPS.func)
-	
+
 	addConfigEntry(btnFPS, 0, -35)
 	addon.aboutPanel.btnFPS = btnFPS
-	
+
 	local btnHomePing = createCheckbutton(addon.aboutPanel, L.SlashHomePingChkBtn)
 	btnHomePing:SetScript("OnShow", function() btnHomePing:SetChecked(LagBar_DB.homeping) end)
 	btnHomePing.func = function(slashSwitch)
@@ -254,10 +254,10 @@ function configFrame:EnableConfig()
 		end
 	end
 	btnHomePing:SetScript("OnClick", btnHomePing.func)
-	
+
 	addConfigEntry(btnHomePing, 0, -20)
 	addon.aboutPanel.btnHomePing = btnHomePing
-	
+
 	local btnWorldPing = createCheckbutton(addon.aboutPanel, L.SlashWorldPingChkBtn)
 	btnWorldPing:SetScript("OnShow", function() btnWorldPing:SetChecked(LagBar_DB.worldping) end)
 	btnWorldPing.func = function(slashSwitch)
@@ -273,10 +273,10 @@ function configFrame:EnableConfig()
 		end
 	end
 	btnWorldPing:SetScript("OnClick", btnWorldPing.func)
-	
+
 	addConfigEntry(btnWorldPing, 0, -20)
 	addon.aboutPanel.btnWorldPing = btnWorldPing
-	
+
 	local btnImpDisplay = createCheckbutton(addon.aboutPanel, L.SlashImpDisplayChkBtn)
 	btnImpDisplay:SetScript("OnShow", function() btnImpDisplay:SetChecked(LagBar_DB.impdisplay) end)
 	btnImpDisplay.func = function(slashSwitch)
@@ -292,10 +292,10 @@ function configFrame:EnableConfig()
 		end
 	end
 	btnImpDisplay:SetScript("OnClick", btnImpDisplay.func)
-	
+
 	addConfigEntry(btnImpDisplay, 0, -20)
 	addon.aboutPanel.btnImpDisplay = btnImpDisplay
-	
+
 	local btnMetricLabels = createCheckbutton(addon.aboutPanel, L.SlashMetricLabelsChkBtn)
 	btnMetricLabels:SetScript("OnShow", function() btnMetricLabels:SetChecked(LagBar_DB.metric) end)
 	btnMetricLabels.func = function(slashSwitch)
@@ -311,8 +311,28 @@ function configFrame:EnableConfig()
 		end
 	end
 	btnMetricLabels:SetScript("OnClick", btnMetricLabels.func)
-	
+
 	addConfigEntry(btnMetricLabels, 0, -20)
 	addon.aboutPanel.btnMetricLabels = btnMetricLabels
-	
+
+	local btnClampToScreen = createCheckbutton(addon.aboutPanel, L.SlashClampToScreenChkBtn)
+	btnClampToScreen:SetScript("OnShow", function() btnClampToScreen:SetChecked(LagBar_DB.clampToScreen) end)
+	btnClampToScreen.func = function(slashSwitch)
+		local value = LagBar_DB.clampToScreen
+		if not slashSwitch then value = LagBar_DB.clampToScreen end
+
+		if value then
+			LagBar_DB.clampToScreen = false
+			addon:SetClampedToScreen(false)
+		else
+			LagBar_DB.clampToScreen = true
+			addon:SetClampedToScreen(true)
+		end
+	end
+	btnClampToScreen:SetScript("OnClick", btnClampToScreen.func)
+
+	addConfigEntry(btnClampToScreen, 0, -20)
+	addon.aboutPanel.btnClampToScreen = btnClampToScreen
+
+
 end
