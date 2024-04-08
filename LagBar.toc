@@ -5,7 +5,7 @@
 ## Interface-Cata: 40400
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  6.8
+## Version:  6.9
 ## IconTexture: 136091
 ## X-Curse-Project-ID: 17487
 ## X-WoWI-ID: 12373
