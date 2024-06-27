@@ -1,11 +1,10 @@
-## Interface: 100206
-## Interface-Retail: 100206
+## Interface: 100207
+## Interface-Retail: 100207
 ## Interface-Classic: 11502
-## Interface-Wrath: 30403
 ## Interface-Cata: 40400
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  6.9
+## Version:  7.0
 ## IconTexture: 136091
 ## X-Curse-Project-ID: 17487
 ## X-WoWI-ID: 12373

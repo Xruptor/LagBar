@@ -334,5 +334,22 @@ function configFrame:EnableConfig()
 	addConfigEntry(btnClampToScreen, 0, -20)
 	addon.aboutPanel.btnClampToScreen = btnClampToScreen
 
+	--login message
+	local btnAddonLoadedChk = createCheckbutton(addon.aboutPanel, L.AddonLoginMsg)
+	btnAddonLoadedChk:SetScript("OnShow", function() btnAddonLoadedChk:SetChecked(LagBar_DB.addonLoginMsg) end)
+	btnAddonLoadedChk.func = function(slashSwitch)
+		local value = LagBar_DB.addonLoginMsg
+		if not slashSwitch then value = LagBar_DB.addonLoginMsg end
+
+		if value then
+			LagBar_DB.addonLoginMsg = false
+		else
+			LagBar_DB.addonLoginMsg = true
+		end
+	end
+	btnAddonLoadedChk:SetScript("OnClick", btnAddonLoadedChk.func)
+
+	addConfigEntry(btnAddonLoadedChk, 0, -20)
+	addon.aboutPanel.btnAddonLoadedChk = btnAddonLoadedChk
 
 end

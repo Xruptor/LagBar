@@ -55,6 +55,8 @@ L.SlashMetricLabelsChkBtn = "Show metric labels in display."
 
 L.SlashClampToScreenChkBtn = "Clamp the LagBar frame to the screen. |cFF99CC33(Prevents being dragged off screen)|r"
 
+L.AddonLoginMsg = "Show addon loaded announcement at login."
+
 L.TooltipDragInfo = "[Hold Shift and Drag to move window.]"
 L.FPS = "fps"
 L.Milliseconds = "ms"

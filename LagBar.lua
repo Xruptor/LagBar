@@ -141,6 +141,7 @@ function addon:EnableAddon()
 	if LagBar_DB.homeping == nil then LagBar_DB.homeping = true end
 	if LagBar_DB.metric == nil then LagBar_DB.metric = true end
 	if LagBar_DB.clampToScreen == nil then LagBar_DB.clampToScreen = true end
+	if LagBar_DB.addonLoginMsg == nil then LagBar_DB.addonLoginMsg = true end
 
 	self:DrawGUI()
 	self:RestoreLayout(ADDON_NAME)
@@ -152,8 +153,10 @@ function addon:EnableAddon()
 
 	if addon.configFrame then addon.configFrame:EnableConfig() end
 
-	local ver = GetAddOnMetadata(ADDON_NAME,"Version") or '1.0'
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("|cFF99CC33%s|r [v|cFF20ff20%s|r] loaded:   /lagbar", ADDON_NAME, ver or "1.0"))
+	if LagBar_DB.addonLoginMsg then
+		local ver = GetAddOnMetadata(ADDON_NAME,"Version") or '1.0'
+		DEFAULT_CHAT_FRAME:AddMessage(string.format("|cFF99CC33%s|r [v|cFF20ff20%s|r] loaded:   /lagbar", ADDON_NAME, ver or "1.0"))
+	end
 end
 
 function LagBar_SlashCommand(cmd)
