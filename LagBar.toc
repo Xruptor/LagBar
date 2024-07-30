@@ -10,6 +10,7 @@
 ## X-WoWI-ID: 12373
 ## X-Wago-ID: 0mKOyZNx
 ## Notes: Displays a simple bar with some Latency Information.
+## Notes-zhCN: 显示延迟/帧数信息的简单提醒。
 ## OptionalDeps: tekDebug
 ## SavedVariables: LagBar_DB
 
@@ -17,6 +18,7 @@ libs\LibStub\LibStub.lua
 libs\AceLocale-3.0\AceLocale-3.0.xml
 
 locale\enUS.lua
+locale\zhCN.lua
 
 LagBar.lua
 config.lua
