@@ -242,6 +242,9 @@ function addon:DrawGUI()
 	g:SetPoint("CENTER",0,0)
 	g:SetText("")
 
+	--this will reize the frame each time the settext is called
+	hooksecurefunc(g, "SetText", function(self) self:GetParent():SetWidth(self:GetWidth() + 20) end)
+
 	addon:SetScript("OnMouseDown",function()
 		if (IsShiftKeyDown()) then
 			self.isMoving = true
@@ -269,6 +272,7 @@ function addon:DrawGUI()
 			local finalText = ""
 			local metric
 
+			local dispTxt = {}
 
 			if LagBar_DB.metric then metric = L.FPS else metric = "" end
 			--thanks to comix1234 on wowinterface.com for the update.
@@ -279,59 +283,50 @@ function addon:DrawGUI()
 				framerate_text = ""
 			end
 
+			--FPS
+			table.insert(dispTxt, framerate_text)
+
 			if LagBar_DB.metric then metric = L.Milliseconds else metric = "" end
 			local latencyHome = select(3, GetNetStats())
 			local latency_text = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome)
+			if LagBar_DB.impdisplay then
+				latency_text = "|cFF99CC33"..L.Home..": |r"..latency_text
+			end
 
 			if not LagBar_DB.homeping then
 				latency_text = ""
 			end
 
+			--latency home
+			table.insert(dispTxt, latency_text)
+
 			if LagBar_DB.metric then metric = L.Milliseconds else metric = "" end
 			local latencyWorld = select(4, GetNetStats())
 			local latency_text_server = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
+			if LagBar_DB.impdisplay then
+				latency_text_server = "|cFF99CC33"..L.World..": |r"..latency_text_server
+			end
 
 			if not LagBar_DB.worldping then
 				latency_text_server = ""
 			end
 
+			--latency world
+			table.insert(dispTxt, latency_text_server)
 
-			if LagBar_DB.fps and (LagBar_DB.homeping or LagBar_DB.worldping) then
-				finalText = framerate_text.." | "
-			else
-				finalText = framerate_text
-			end
-
-			if LagBar_DB.homeping and LagBar_DB.worldping then
-				if LagBar_DB.impdisplay then
-					finalText = finalText.."|cFF99CC33"..L.Home..":|r"..latency_text.." | "
-				else
-					finalText = finalText..latency_text.." | "
-				end
-			elseif LagBar_DB.homeping then
-				if LagBar_DB.impdisplay then
-					finalText = finalText.."|cFF99CC33"..L.Home..":|r"..latency_text
-				else
-					finalText = finalText..latency_text
+			--display it
+			for i=1, #dispTxt do
+				if dispTxt[i] ~= "" then
+					finalText = finalText..dispTxt[i].." | "
 				end
 			end
-
-			if LagBar_DB.worldping then
-				if LagBar_DB.impdisplay then
-					finalText = finalText.."|cFF99CC33"..L.World..":|r"..latency_text_server
-				else
-					finalText = finalText..latency_text_server
-				end
+			--remove the trailing pipe
+			if finalText ~= "" then
+				finalText = string.sub(finalText, 1, -4)
 			end
 
+			--remember the frame gets auto sized by the hooksecurefunc found in DrawUI
 			g:SetText(finalText)
-
-			--check for overlapping text (JUST IN CASE)
-			if g:GetStringWidth() > addon:GetWidth() then
-				addon:SetWidth(g:GetStringWidth() + 20)
-			elseif (addon:GetWidth() - g:GetStringWidth()) > 41 then
-				addon:SetWidth(g:GetStringWidth() + 41)
-			end
 
 		end
 
