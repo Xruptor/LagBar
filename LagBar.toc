@@ -1,7 +1,7 @@
 ## Interface: 120000, 110207, 50503, 40402, 38000, 30405, 20504, 11508
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  7.9
+## Version:  8.0
 ## IconTexture: 136091
 ## X-Curse-Project-ID: 17487
 ## X-WoWI-ID: 12373
@@ -11,11 +11,10 @@
 ## OptionalDeps: tekDebug
 ## SavedVariables: LagBar_DB
 
-libs\LibStub\LibStub.lua
-libs\AceLocale-3.0\AceLocale-3.0.xml
-
+locale\Locale.lua
 locale\enUS.lua
 locale\zhCN.lua
+locale\ruRU.lua
 
 LagBar.lua
 config.lua

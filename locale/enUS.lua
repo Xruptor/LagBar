@@ -1,6 +1,6 @@
-local ADDON_NAME, addon = ...
-
-local L = LibStub("AceLocale-3.0"):NewLocale(ADDON_NAME, "enUS", true)
+local ADDON_NAME = ...
+local addon = _G[ADDON_NAME]
+local L = addon and addon.L
 if not L then return end
 
 L.SlashBG = "bg"
@@ -62,3 +62,10 @@ L.FPS = "fps"
 L.Milliseconds = "ms"
 L.Home = "H"
 L.World = "W"
+
+-- Capture enUS defaults so other locales can safely override while still allowing
+-- enUS slash-command aliases to work everywhere.
+addon.L_enUS = addon.L_enUS or {}
+for k, v in pairs(L) do
+	addon.L_enUS[k] = v
+end

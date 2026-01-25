@@ -6,11 +6,11 @@ if not _G[ADDON_NAME] then
 end
 addon = _G[ADDON_NAME]
 
-local L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
-
-local debugf = tekDebug and tekDebug:GetFrame(ADDON_NAME)
-local function Debug(...)
-    if debugf then debugf:AddMessage(string.join(", ", tostringall(...))) end
+local L = addon.L
+if not L then
+	L = {}
+	setmetatable(L, { __index = function(_, k) return k end })
+	addon.L = L
 end
 
 addon:RegisterEvent("ADDON_LOADED")
@@ -35,10 +35,21 @@ addon:SetScript("OnEvent", function(self, event, ...)
 	end
 end)
 
-local MAX_INTERVAL = 1
-local UPDATE_INTERVAL = 0
+local UPDATE_INTERVAL = 1
 
 local lagBarTooltip = CreateFrame("GameTooltip", "LagBarTooltip", UIParent, "GameTooltipTemplate")
+
+local floor = math.floor
+local format = string.format
+local max = math.max
+local GetFramerate = GetFramerate
+local GetNetStats = GetNetStats
+local wipe = wipe or function(t) for k in pairs(t) do t[k] = nil end end
+
+local MIN_FRAME_WIDTH = 30
+local MIN_FRAME_HEIGHT = 25
+local TEXT_PADDING_X = 20
+local TEXT_PADDING_Y = 10
 
 ----------------------
 -- Color Functions  --
@@ -154,28 +165,42 @@ function addon:EnableAddon()
 	if addon.configFrame then addon.configFrame:EnableConfig() end
 
 	if LagBar_DB.addonLoginMsg then
-		local ver = C_AddOns.GetAddOnMetadata(ADDON_NAME,"Version") or '1.0'
+		local GetAddonMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+		local ver = (GetAddonMetadata and GetAddonMetadata(ADDON_NAME, "Version")) or "1.0"
 		DEFAULT_CHAT_FRAME:AddMessage(string.format("|cFF99CC33%s|r [v|cFF20ff20%s|r] loaded:   /lagbar", ADDON_NAME, ver or "1.0"))
 	end
 end
 
 function LagBar_SlashCommand(cmd)
 
-	local a,b,c=strfind(cmd, "(%S+)"); --contiguous string of non-space characters
+	local a,b,c = string.find(cmd, "(%S+)") -- contiguous string of non-space characters
+	local baseL = addon.L_enUS
+
+	local function matches(token, key)
+		if not token or not key then return false end
+		token = token:lower()
+		local v = L[key]
+		if type(v) == "string" and token == v:lower() then return true end
+		if baseL then
+			local bv = baseL[key]
+			if type(bv) == "string" and token == bv:lower() then return true end
+		end
+		return false
+	end
 
 	if a then
-		if c and c:lower() == L.SlashBG then
+		if matches(c, "SlashBG") then
 			addon.aboutPanel.btnBG.func(true)
 			return true
-		elseif c and c:lower() == L.SlashTT then
+		elseif matches(c, "SlashTT") then
 			addon.aboutPanel.btnTT.func()
 			return true
-		elseif c and c:lower() == L.SlashReset then
+		elseif matches(c, "SlashReset") then
 			addon.aboutPanel.btnReset.func()
 			return true
-		elseif c and c:lower() == L.SlashScale then
+		elseif matches(c, "SlashScale") then
 			if b then
-				local scalenum = strsub(cmd, b+2)
+				local scalenum = string.sub(cmd, b + 2)
 				if scalenum and scalenum ~= "" and tonumber(scalenum) and tonumber(scalenum) >= 0.5 and tonumber(scalenum) <= 5 then
 					addon:SetAddonScale(tonumber(scalenum))
 				else
@@ -183,19 +208,19 @@ function LagBar_SlashCommand(cmd)
 				end
 				return true
 			end
-		elseif c and c:lower() == L.SlashWorldPing then
+		elseif matches(c, "SlashWorldPing") then
 			addon.aboutPanel.btnWorldPing.func(true)
 			return true
-		elseif c and c:lower() == L.SlashFPS then
+		elseif matches(c, "SlashFPS") then
 			addon.aboutPanel.btnFPS.func(true)
 			return true
-		elseif c and c:lower() == L.SlashHomePing then
+		elseif matches(c, "SlashHomePing") then
 			addon.aboutPanel.btnHomePing.func(true)
 			return true
-		elseif c and c:lower() == L.SlashImpDisplay then
+		elseif matches(c, "SlashImpDisplay") then
 			addon.aboutPanel.btnImpDisplay.func(true)
 			return true
-		elseif c and c:lower() == L.SlashMetricLabels then
+		elseif matches(c, "SlashMetricLabels") then
 			addon.aboutPanel.btnMetricLabels.func(true)
 			return true
 		end
@@ -222,7 +247,7 @@ function addon:DrawGUI()
 
 	addon:SetAddonScale(LagBar_DB.scale, true)
 
-	if LagBar_DB.bgShown == 1 then
+	if LagBar_DB.bgShown then
 		addon:SetBackdrop( {
 			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground";
 			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border";
@@ -241,17 +266,15 @@ function addon:DrawGUI()
 	g:SetJustifyH("LEFT")
 	g:SetPoint("CENTER",0,0)
 	g:SetText("")
+	addon.text = g
 
-	--this will reize the frame each time the settext is called
-	hooksecurefunc(g, "SetText", function(self) self:GetParent():SetWidth(self:GetWidth() + 20) end)
-
-	addon:SetScript("OnMouseDown",function()
+	addon:SetScript("OnMouseDown",function(self)
 		if (IsShiftKeyDown()) then
 			self.isMoving = true
 			self:StartMoving();
 	 	end
 	end)
-	addon:SetScript("OnMouseUp",function()
+	addon:SetScript("OnMouseUp",function(self)
 		if( self.isMoving ) then
 
 			self.isMoving = nil
@@ -262,75 +285,7 @@ function addon:DrawGUI()
 		end
 	end)
 
-	addon:SetScript("OnUpdate", function(self, arg1)
-
-		if (UPDATE_INTERVAL > 0) then
-			UPDATE_INTERVAL = UPDATE_INTERVAL - arg1
-		else
-			UPDATE_INTERVAL = MAX_INTERVAL;
-
-			local finalText = ""
-			local metric
-
-			local dispTxt = {}
-
-			if LagBar_DB.metric then metric = L.FPS else metric = "" end
-			--thanks to comix1234 on wowinterface.com for the update.
-			local framerate = floor(GetFramerate() + 0.5)
-			local framerate_text = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(framerate / 60), framerate)
-
-			if not LagBar_DB.fps then
-				framerate_text = ""
-			end
-
-			--FPS
-			table.insert(dispTxt, framerate_text)
-
-			if LagBar_DB.metric then metric = L.Milliseconds else metric = "" end
-			local latencyHome = select(3, GetNetStats())
-			local latency_text = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome)
-			if LagBar_DB.impdisplay then
-				latency_text = "|cFF99CC33"..L.Home..": |r"..latency_text
-			end
-
-			if not LagBar_DB.homeping then
-				latency_text = ""
-			end
-
-			--latency home
-			table.insert(dispTxt, latency_text)
-
-			if LagBar_DB.metric then metric = L.Milliseconds else metric = "" end
-			local latencyWorld = select(4, GetNetStats())
-			local latency_text_server = format("|cff%s%d|r "..metric, LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld)
-			if LagBar_DB.impdisplay then
-				latency_text_server = "|cFF99CC33"..L.World..": |r"..latency_text_server
-			end
-
-			if not LagBar_DB.worldping then
-				latency_text_server = ""
-			end
-
-			--latency world
-			table.insert(dispTxt, latency_text_server)
-
-			--display it
-			for i=1, #dispTxt do
-				if dispTxt[i] ~= "" then
-					finalText = finalText..dispTxt[i].." | "
-				end
-			end
-			--remove the trailing pipe
-			if finalText ~= "" then
-				finalText = string.sub(finalText, 1, -4)
-			end
-
-			--remember the frame gets auto sized by the hooksecurefunc found in DrawUI
-			g:SetText(finalText)
-
-		end
-
-	end)
+	addon:StartUpdateTicker()
 
 	addon:SetScript("OnLeave",function()
 		lagBarTooltip:Hide()
@@ -351,6 +306,91 @@ function addon:DrawGUI()
 	end)
 
 	addon:Show()
+end
+
+local parts = {}
+
+function addon:UpdateDisplay()
+	if not LagBar_DB then return end
+	if not self.text then return end
+	if not self:IsShown() then return end
+
+	wipe(parts)
+
+	local _, _, latencyHome, latencyWorld = GetNetStats()
+
+	if LagBar_DB.fps then
+		local metric = LagBar_DB.metric and (L.FPS or "fps") or ""
+		local framerate = floor(GetFramerate() + 0.5)
+		parts[#parts + 1] = format("|cff%s%d|r%s", LagBar_GetThresholdHexColor(framerate / 60), framerate, metric ~= "" and (" " .. metric) or "")
+	end
+
+	if LagBar_DB.homeping then
+		local metric = LagBar_DB.metric and (L.Milliseconds or "ms") or ""
+		local latencyText = format("|cff%s%d|r%s", LagBar_GetThresholdHexColor(latencyHome, 1000, 500, 250, 100, 0), latencyHome, metric ~= "" and (" " .. metric) or "")
+		if LagBar_DB.impdisplay then
+			latencyText = "|cFF99CC33" .. (L.Home or "H") .. ": |r" .. latencyText
+		end
+		parts[#parts + 1] = latencyText
+	end
+
+	if LagBar_DB.worldping then
+		local metric = LagBar_DB.metric and (L.Milliseconds or "ms") or ""
+		local latencyText = format("|cff%s%d|r%s", LagBar_GetThresholdHexColor(latencyWorld, 1000, 500, 250, 100, 0), latencyWorld, metric ~= "" and (" " .. metric) or "")
+		if LagBar_DB.impdisplay then
+			latencyText = "|cFF99CC33" .. (L.World or "W") .. ": |r" .. latencyText
+		end
+		parts[#parts + 1] = latencyText
+	end
+
+	local finalText = table.concat(parts, " | ")
+	if finalText ~= self._lastText then
+		self.text:SetText(finalText)
+		self._lastText = finalText
+	end
+
+	local newWidth = max(MIN_FRAME_WIDTH, self.text:GetStringWidth() + TEXT_PADDING_X)
+	local newHeight = max(MIN_FRAME_HEIGHT, self.text:GetStringHeight() + TEXT_PADDING_Y)
+
+	if newWidth ~= self._lastWidth then
+		self:SetWidth(newWidth)
+		self._lastWidth = newWidth
+	end
+
+	if newHeight ~= self._lastHeight then
+		self:SetHeight(newHeight)
+		self._lastHeight = newHeight
+	end
+end
+
+function addon:StopUpdateTicker()
+	if self._ticker then
+		self._ticker:Cancel()
+		self._ticker = nil
+	end
+	self:SetScript("OnUpdate", nil)
+end
+
+function addon:StartUpdateTicker()
+	self:StopUpdateTicker()
+	self:UpdateDisplay()
+
+	if C_Timer and C_Timer.NewTicker then
+		self._ticker = C_Timer.NewTicker(UPDATE_INTERVAL, function()
+			if addon and addon.UpdateDisplay then
+				addon:UpdateDisplay()
+			end
+		end)
+	else
+		local timeSinceLastUpdate = 0
+		self:SetScript("OnUpdate", function(self, elapsed)
+			timeSinceLastUpdate = timeSinceLastUpdate + elapsed
+			if timeSinceLastUpdate >= UPDATE_INTERVAL then
+				timeSinceLastUpdate = 0
+				self:UpdateDisplay()
+			end
+		end)
+	end
 end
 
 function addon:SetAddonScale(value, bypass) 

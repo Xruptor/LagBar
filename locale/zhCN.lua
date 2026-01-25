@@ -1,6 +1,8 @@
-local ADDON_NAME, addon = ...
+local ADDON_NAME = ...
+if GetLocale() ~= "zhCN" then return end
 
-local L = LibStub("AceLocale-3.0"):NewLocale(ADDON_NAME, "zhCN")
+local addon = _G[ADDON_NAME]
+local L = addon and addon.L
 if not L then return end
 
 L.SlashBG = "背景"
@@ -58,7 +60,7 @@ L.SlashClampToScreenChkBtn = "将LagBar 锁定在屏幕内。|cFF99CC33（防止
 L.AddonLoginMsg = "登录时显示已加载插件信息。"
 
 L.TooltipDragInfo = "[按住 Shift 移动窗口。]"
-L.FPS = "fps"
-L.Milliseconds = "ms"
+L.FPS = "帧"
+L.Milliseconds = "毫秒"
 L.Home = "本"
 L.World = "世"

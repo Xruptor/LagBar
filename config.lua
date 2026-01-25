@@ -7,7 +7,12 @@ addon = _G[ADDON_NAME]
 addon.configFrame = CreateFrame("frame", ADDON_NAME.."_config_eventFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 local configFrame = addon.configFrame
 
-local L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
+local L = addon.L
+if not L then
+	L = {}
+	setmetatable(L, { __index = function(_, k) return k end })
+	addon.L = L
+end
 
 local lastObject
 local function addConfigEntry(objEntry, adjustX, adjustY)
@@ -28,7 +33,7 @@ local function createCheckbutton(parentFrame, displayText)
 	chkBoxIndex = chkBoxIndex + 1
 
 	local checkbutton = CreateFrame("CheckButton", ADDON_NAME.."_config_chkbtn_" .. chkBoxIndex, parentFrame, "ChatConfigCheckButtonTemplate")
-	getglobal(checkbutton:GetName() .. 'Text'):SetText(" "..displayText)
+	_G[checkbutton:GetName() .. "Text"]:SetText(" " .. displayText)
 
 	return checkbutton
 end
@@ -92,12 +97,13 @@ end
 local function LoadAboutFrame()
 
 	--Code inspired from tekKonfigAboutPanel
-	local about = CreateFrame("Frame", ADDON_NAME.."AboutPanel", InterfaceOptionsFramePanelContainer, BackdropTemplateMixin and "BackdropTemplate")
+	local about = CreateFrame("Frame", ADDON_NAME.."AboutPanel", InterfaceOptionsFramePanelContainer or UIParent, BackdropTemplateMixin and "BackdropTemplate")
 	about.name = ADDON_NAME
 	about:Hide()
 
     local fields = {"Version", "Author"}
-	local notes = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Notes")
+	local GetAddonMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+	local notes = (GetAddonMetadata and GetAddonMetadata(ADDON_NAME, "Notes")) or ""
 
     local title = about:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 
@@ -115,7 +121,7 @@ local function LoadAboutFrame()
 
 	local anchor
 	for _,field in pairs(fields) do
-		local val = C_AddOns.GetAddOnMetadata(ADDON_NAME, field)
+		local val = GetAddonMetadata and GetAddonMetadata(ADDON_NAME, field)
 		if val then
 			local title = about:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 			title:SetWidth(75)
@@ -239,6 +245,8 @@ function configFrame:EnableConfig()
 			LagBar_DB.fps = true
 			DEFAULT_CHAT_FRAME:AddMessage(L.SlashFPSOn)
 		end
+
+		if addon.UpdateDisplay then addon:UpdateDisplay() end
 	end
 	btnFPS:SetScript("OnClick", btnFPS.func)
 
@@ -258,6 +266,8 @@ function configFrame:EnableConfig()
 			LagBar_DB.homeping = true
 			DEFAULT_CHAT_FRAME:AddMessage(L.SlashHomePingOn)
 		end
+
+		if addon.UpdateDisplay then addon:UpdateDisplay() end
 	end
 	btnHomePing:SetScript("OnClick", btnHomePing.func)
 
@@ -277,6 +287,8 @@ function configFrame:EnableConfig()
 			LagBar_DB.worldping = true
 			DEFAULT_CHAT_FRAME:AddMessage(L.SlashWorldPingOn)
 		end
+
+		if addon.UpdateDisplay then addon:UpdateDisplay() end
 	end
 	btnWorldPing:SetScript("OnClick", btnWorldPing.func)
 
@@ -296,6 +308,8 @@ function configFrame:EnableConfig()
 			LagBar_DB.impdisplay = true
 			DEFAULT_CHAT_FRAME:AddMessage(L.SlashImpDisplayOn)
 		end
+
+		if addon.UpdateDisplay then addon:UpdateDisplay() end
 	end
 	btnImpDisplay:SetScript("OnClick", btnImpDisplay.func)
 
@@ -315,6 +329,8 @@ function configFrame:EnableConfig()
 			LagBar_DB.metric = true
 			DEFAULT_CHAT_FRAME:AddMessage(L.SlashMetricLabelsOn)
 		end
+
+		if addon.UpdateDisplay then addon:UpdateDisplay() end
 	end
 	btnMetricLabels:SetScript("OnClick", btnMetricLabels.func)
 
