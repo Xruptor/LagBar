@@ -10,8 +10,7 @@ on:
     tags:
       - '!v*.*.*-*'
       - '!v*.*-*'
-      - 'v*.*.*'
-      - 'v*.*'
+      - 'v*'
 
 # a workflow is built up as jobs, and within these jobs are steps
 jobs:
@@ -35,20 +34,10 @@ jobs:
     steps:
       # we first have to clone the AddOn project, this is a required step
       - name: Clone project
-        uses: actions/checkout@v1
-
-      # Package and release the retail version
-      - name: Create Retail Package
-        uses: BigWigsMods/packager@master
-
-      # Package and release the Classic version
-      - name: Create Classic Package
-        uses: BigWigsMods/packager@master
+        uses: actions/checkout@v4
         with:
-          args: -g classic
+          fetch-depth: 0
 
-       # Package and release the Cata version
-      - name: Create Cata Package
-        uses: BigWigsMods/packager@master
-        with:
-          args: -g Cata		  
+      # Package and release (auto-detects supported game versions from TOC)
+      - name: Package and release
+        uses: BigWigsMods/packager@v2
