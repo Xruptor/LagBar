@@ -1,8 +1,6 @@
-local ADDON_NAME = ...
-if GetLocale() ~= "zhCN" then return end
+local ADDON_NAME, private = ...
 
-local addon = _G[ADDON_NAME]
-local L = addon and addon.L
+local L = private:NewLocale("zhCN")
 if not L then return end
 
 L.SlashBG = "背景"

@@ -1,6 +1,6 @@
-local ADDON_NAME = ...
-local addon = _G[ADDON_NAME]
-local L = addon and addon.L
+local ADDON_NAME, private = ...
+
+local L = private:NewLocale("enUS", true)
 if not L then return end
 
 L.SlashBG = "bg"
@@ -65,7 +65,10 @@ L.World = "W"
 
 -- Capture enUS defaults so other locales can safely override while still allowing
 -- enUS slash-command aliases to work everywhere.
-addon.L_enUS = addon.L_enUS or {}
-for k, v in pairs(L) do
-	addon.L_enUS[k] = v
+local addon = _G[ADDON_NAME]
+if addon then
+	addon.L_enUS = addon.L_enUS or {}
+	for k, v in pairs(L) do
+		addon.L_enUS[k] = v
+	end
 end

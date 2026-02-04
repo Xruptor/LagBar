@@ -1,7 +1,7 @@
-## Interface: 120000, 110207, 50503, 40402, 38000, 30405, 20504, 11508
+## Interface: 120000, 110207, 50503, 40402, 38000, 30405, 20505, 11508
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  8.0
+## Version:  8.1
 ## IconTexture: 136091
 ## X-Curse-Project-ID: 17487
 ## X-WoWI-ID: 12373
@@ -11,9 +11,17 @@
 ## OptionalDeps: tekDebug
 ## SavedVariables: LagBar_DB
 
-locale\Locale.lua
+locale\locales.lua
 locale\enUS.lua
+locale\deDE.lua
+locale\esES.lua
+locale\esMX.lua
+locale\frFR.lua
+locale\itIT.lua
+locale\koKR.lua
+locale\ptBR.lua
 locale\zhCN.lua
+locale\zhTW.lua
 locale\ruRU.lua
 
 LagBar.lua

@@ -1,8 +1,6 @@
-local ADDON_NAME = ...
-if GetLocale() ~= "ruRU" then return end
+local ADDON_NAME, private = ...
 
-local addon = _G[ADDON_NAME]
-local L = addon and addon.L
+local L = private:NewLocale("ruRU")
 if not L then return end
 -- Translator ZamestoTV
 L.SlashBG = "фон"
