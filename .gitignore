@@ -2,3 +2,4 @@
 .vscode/settings.json
 
 LagBar.code-workspace
+.github/workflows/release.yml

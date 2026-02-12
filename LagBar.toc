@@ -1,7 +1,7 @@
 ## Interface: 120001, 110207, 50503, 40402, 38000, 30405, 20505, 11508
 ## Title: LagBar
 ## Author: Xruptor
-## Version:  8.2
+## Version:  8.3
 ## IconTexture: 136091
 ## X-Curse-Project-ID: 17487
 ## X-WoWI-ID: 12373

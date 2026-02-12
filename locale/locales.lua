@@ -17,6 +17,7 @@ private._locales = private._locales or {
 	current = current,
 	default = nil,
 	locales = {},
+	defaultMT = nil,
 }
 private._locales.current = current
 
@@ -39,11 +40,19 @@ end
 
 function private:GetLocale()
 	local store = private._locales
-	local L = store.locales[store.current] or store.default or {}
-	if store.default and L ~= store.default then
-		return setmetatable(L, { __index = store.default })
+	local currentLocale = store.locales[store.current]
+	if currentLocale then
+		if store.default and currentLocale ~= store.default then
+			if not store.defaultMT or store.defaultMT.__index ~= store.default then
+				store.defaultMT = { __index = store.default }
+			end
+			if getmetatable(currentLocale) ~= store.defaultMT then
+				setmetatable(currentLocale, store.defaultMT)
+			end
+		end
+		return currentLocale
 	end
-	return L
+	return store.default or {}
 end
 
 private.L = private.L or setmetatable({}, {

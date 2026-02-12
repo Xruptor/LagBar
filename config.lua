@@ -14,6 +14,8 @@ if not L then
 	addon.L = L
 end
 
+local DEFAULT_CHAT_FRAME = DEFAULT_CHAT_FRAME
+
 local lastObject
 local function addConfigEntry(objEntry, adjustX, adjustY)
 
@@ -94,6 +96,30 @@ local function createSlider(parentFrame, displayText, minVal, maxVal, setStep)
 	return slider
 end
 
+local function toggleSetting(key, onMsg, offMsg, onToggle)
+	local newValue = not LagBar_DB[key]
+	LagBar_DB[key] = newValue
+	if onMsg and offMsg then
+		DEFAULT_CHAT_FRAME:AddMessage(newValue and onMsg or offMsg)
+	end
+	if onToggle then
+		onToggle(newValue)
+	end
+	return newValue
+end
+
+local function addToggleOption(opts)
+	local btn = createCheckbutton(addon.aboutPanel, opts.label)
+	btn:SetScript("OnShow", function() btn:SetChecked(LagBar_DB[opts.key]) end)
+	btn.func = function()
+		toggleSetting(opts.key, opts.onMsg, opts.offMsg, opts.onToggle)
+	end
+	btn:SetScript("OnClick", btn.func)
+	addConfigEntry(btn, 0, opts.offset or -20)
+	addon.aboutPanel[opts.storeKey] = btn
+	return btn
+end
+
 local function LoadAboutFrame()
 
 	--Code inspired from tekKonfigAboutPanel
@@ -101,11 +127,11 @@ local function LoadAboutFrame()
 	about.name = ADDON_NAME
 	about:Hide()
 
-    local fields = {"Version", "Author"}
+	local fields = {"Version", "Author"}
 	local GetAddonMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
 	local notes = (GetAddonMetadata and GetAddonMetadata(ADDON_NAME, "Notes")) or ""
 
-    local title = about:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	local title = about:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 
 	title:SetPoint("TOPLEFT", 16, -16)
 	title:SetText(ADDON_NAME)
@@ -156,46 +182,25 @@ function configFrame:EnableConfig()
 	addon.aboutPanel = LoadAboutFrame()
 
 	--bg shown
-	local btnBG = createCheckbutton(addon.aboutPanel, L.SlashBGInfo)
-	btnBG:SetScript("OnShow", function() btnBG:SetChecked(LagBar_DB.bgShown) end)
-	btnBG.func = function(slashSwitch)
-		local value = LagBar_DB.bgShown
-		if not slashSwitch then value = LagBar_DB.bgShown end
-
-		if value then
-			LagBar_DB.bgShown = false
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashBGOff)
-		else
-			LagBar_DB.bgShown = true
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashBGOn)
-		end
-
-		addon:BackgroundToggle()
-	end
-	btnBG:SetScript("OnClick", btnBG.func)
-
-	addConfigEntry(btnBG, 0, -20)
-	addon.aboutPanel.btnBG = btnBG
+	addToggleOption({
+		key = "bgShown",
+		label = L.SlashBGInfo,
+		onMsg = L.SlashBGOn,
+		offMsg = L.SlashBGOff,
+		onToggle = function() addon:BackgroundToggle() end,
+		offset = -20,
+		storeKey = "btnBG",
+	})
 
 	--show tooltip
-	local btnTT = createCheckbutton(addon.aboutPanel, L.SlashTTInfo)
-	btnTT:SetScript("OnShow", function() btnTT:SetChecked(LagBar_DB.ttShown) end)
-	btnTT.func = function(slashSwitch)
-		local value = LagBar_DB.ttShown
-		if not slashSwitch then value = LagBar_DB.ttShown end
-
-		if value then
-			LagBar_DB.ttShown = false
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashTTOff)
-		else
-			LagBar_DB.ttShown = true
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashTTOn)
-		end
-	end
-	btnTT:SetScript("OnClick", btnTT.func)
-
-	addConfigEntry(btnTT, 0, -25)
-	addon.aboutPanel.btnTT = btnTT
+	addToggleOption({
+		key = "ttShown",
+		label = L.SlashTTInfo,
+		onMsg = L.SlashTTOn,
+		offMsg = L.SlashTTOff,
+		offset = -25,
+		storeKey = "btnTT",
+	})
 
 	--reset
 	local btnReset = createButton(addon.aboutPanel, L.SlashResetInfo)
@@ -232,146 +237,70 @@ function configFrame:EnableConfig()
 	addConfigEntry(sliderScale, 0, -40)
 	addon.aboutPanel.sliderScale = sliderScale
 
-	local btnFPS = createCheckbutton(addon.aboutPanel, L.SlashFPSChkBtn)
-	btnFPS:SetScript("OnShow", function() btnFPS:SetChecked(LagBar_DB.fps) end)
-	btnFPS.func = function(slashSwitch)
-		local value = LagBar_DB.fps
-		if not slashSwitch then value = LagBar_DB.fps end
+	addToggleOption({
+		key = "fps",
+		label = L.SlashFPSChkBtn,
+		onMsg = L.SlashFPSOn,
+		offMsg = L.SlashFPSOff,
+		onToggle = function() if addon.UpdateDisplay then addon:UpdateDisplay() end end,
+		offset = -35,
+		storeKey = "btnFPS",
+	})
 
-		if value then
-			LagBar_DB.fps = false
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashFPSOff)
-		else
-			LagBar_DB.fps = true
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashFPSOn)
-		end
+	addToggleOption({
+		key = "homeping",
+		label = L.SlashHomePingChkBtn,
+		onMsg = L.SlashHomePingOn,
+		offMsg = L.SlashHomePingOff,
+		onToggle = function() if addon.UpdateDisplay then addon:UpdateDisplay() end end,
+		offset = -20,
+		storeKey = "btnHomePing",
+	})
 
-		if addon.UpdateDisplay then addon:UpdateDisplay() end
-	end
-	btnFPS:SetScript("OnClick", btnFPS.func)
+	addToggleOption({
+		key = "worldping",
+		label = L.SlashWorldPingChkBtn,
+		onMsg = L.SlashWorldPingOn,
+		offMsg = L.SlashWorldPingOff,
+		onToggle = function() if addon.UpdateDisplay then addon:UpdateDisplay() end end,
+		offset = -20,
+		storeKey = "btnWorldPing",
+	})
 
-	addConfigEntry(btnFPS, 0, -35)
-	addon.aboutPanel.btnFPS = btnFPS
+	addToggleOption({
+		key = "impdisplay",
+		label = L.SlashImpDisplayChkBtn,
+		onMsg = L.SlashImpDisplayOn,
+		offMsg = L.SlashImpDisplayOff,
+		onToggle = function() if addon.UpdateDisplay then addon:UpdateDisplay() end end,
+		offset = -20,
+		storeKey = "btnImpDisplay",
+	})
 
-	local btnHomePing = createCheckbutton(addon.aboutPanel, L.SlashHomePingChkBtn)
-	btnHomePing:SetScript("OnShow", function() btnHomePing:SetChecked(LagBar_DB.homeping) end)
-	btnHomePing.func = function(slashSwitch)
-		local value = LagBar_DB.homeping
-		if not slashSwitch then value = LagBar_DB.homeping end
+	addToggleOption({
+		key = "metric",
+		label = L.SlashMetricLabelsChkBtn,
+		onMsg = L.SlashMetricLabelsOn,
+		offMsg = L.SlashMetricLabelsOff,
+		onToggle = function() if addon.UpdateDisplay then addon:UpdateDisplay() end end,
+		offset = -20,
+		storeKey = "btnMetricLabels",
+	})
 
-		if value then
-			LagBar_DB.homeping = false
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashHomePingOff)
-		else
-			LagBar_DB.homeping = true
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashHomePingOn)
-		end
-
-		if addon.UpdateDisplay then addon:UpdateDisplay() end
-	end
-	btnHomePing:SetScript("OnClick", btnHomePing.func)
-
-	addConfigEntry(btnHomePing, 0, -20)
-	addon.aboutPanel.btnHomePing = btnHomePing
-
-	local btnWorldPing = createCheckbutton(addon.aboutPanel, L.SlashWorldPingChkBtn)
-	btnWorldPing:SetScript("OnShow", function() btnWorldPing:SetChecked(LagBar_DB.worldping) end)
-	btnWorldPing.func = function(slashSwitch)
-		local value = LagBar_DB.worldping
-		if not slashSwitch then value = LagBar_DB.worldping end
-
-		if value then
-			LagBar_DB.worldping = false
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashWorldPingOff)
-		else
-			LagBar_DB.worldping = true
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashWorldPingOn)
-		end
-
-		if addon.UpdateDisplay then addon:UpdateDisplay() end
-	end
-	btnWorldPing:SetScript("OnClick", btnWorldPing.func)
-
-	addConfigEntry(btnWorldPing, 0, -20)
-	addon.aboutPanel.btnWorldPing = btnWorldPing
-
-	local btnImpDisplay = createCheckbutton(addon.aboutPanel, L.SlashImpDisplayChkBtn)
-	btnImpDisplay:SetScript("OnShow", function() btnImpDisplay:SetChecked(LagBar_DB.impdisplay) end)
-	btnImpDisplay.func = function(slashSwitch)
-		local value = LagBar_DB.impdisplay
-		if not slashSwitch then value = LagBar_DB.impdisplay end
-
-		if value then
-			LagBar_DB.impdisplay = false
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashImpDisplayOff)
-		else
-			LagBar_DB.impdisplay = true
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashImpDisplayOn)
-		end
-
-		if addon.UpdateDisplay then addon:UpdateDisplay() end
-	end
-	btnImpDisplay:SetScript("OnClick", btnImpDisplay.func)
-
-	addConfigEntry(btnImpDisplay, 0, -20)
-	addon.aboutPanel.btnImpDisplay = btnImpDisplay
-
-	local btnMetricLabels = createCheckbutton(addon.aboutPanel, L.SlashMetricLabelsChkBtn)
-	btnMetricLabels:SetScript("OnShow", function() btnMetricLabels:SetChecked(LagBar_DB.metric) end)
-	btnMetricLabels.func = function(slashSwitch)
-		local value = LagBar_DB.metric
-		if not slashSwitch then value = LagBar_DB.metric end
-
-		if value then
-			LagBar_DB.metric = false
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashMetricLabelsOff)
-		else
-			LagBar_DB.metric = true
-			DEFAULT_CHAT_FRAME:AddMessage(L.SlashMetricLabelsOn)
-		end
-
-		if addon.UpdateDisplay then addon:UpdateDisplay() end
-	end
-	btnMetricLabels:SetScript("OnClick", btnMetricLabels.func)
-
-	addConfigEntry(btnMetricLabels, 0, -20)
-	addon.aboutPanel.btnMetricLabels = btnMetricLabels
-
-	local btnClampToScreen = createCheckbutton(addon.aboutPanel, L.SlashClampToScreenChkBtn)
-	btnClampToScreen:SetScript("OnShow", function() btnClampToScreen:SetChecked(LagBar_DB.clampToScreen) end)
-	btnClampToScreen.func = function(slashSwitch)
-		local value = LagBar_DB.clampToScreen
-		if not slashSwitch then value = LagBar_DB.clampToScreen end
-
-		if value then
-			LagBar_DB.clampToScreen = false
-			addon:SetClampedToScreen(false)
-		else
-			LagBar_DB.clampToScreen = true
-			addon:SetClampedToScreen(true)
-		end
-	end
-	btnClampToScreen:SetScript("OnClick", btnClampToScreen.func)
-
-	addConfigEntry(btnClampToScreen, 0, -20)
-	addon.aboutPanel.btnClampToScreen = btnClampToScreen
+	addToggleOption({
+		key = "clampToScreen",
+		label = L.SlashClampToScreenChkBtn,
+		onToggle = function(value) addon:SetClampedToScreen(value) end,
+		offset = -20,
+		storeKey = "btnClampToScreen",
+	})
 
 	--login message
-	local btnAddonLoadedChk = createCheckbutton(addon.aboutPanel, L.AddonLoginMsg)
-	btnAddonLoadedChk:SetScript("OnShow", function() btnAddonLoadedChk:SetChecked(LagBar_DB.addonLoginMsg) end)
-	btnAddonLoadedChk.func = function(slashSwitch)
-		local value = LagBar_DB.addonLoginMsg
-		if not slashSwitch then value = LagBar_DB.addonLoginMsg end
-
-		if value then
-			LagBar_DB.addonLoginMsg = false
-		else
-			LagBar_DB.addonLoginMsg = true
-		end
-	end
-	btnAddonLoadedChk:SetScript("OnClick", btnAddonLoadedChk.func)
-
-	addConfigEntry(btnAddonLoadedChk, 0, -20)
-	addon.aboutPanel.btnAddonLoadedChk = btnAddonLoadedChk
+	addToggleOption({
+		key = "addonLoginMsg",
+		label = L.AddonLoginMsg,
+		offset = -20,
+		storeKey = "btnAddonLoadedChk",
+	})
 
 end
