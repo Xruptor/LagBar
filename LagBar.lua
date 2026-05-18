@@ -350,7 +350,14 @@ function addon:UpdateDisplay()
 	end
 
 	if db.homeping or db.worldping then
-		local _, _, latencyHome, latencyWorld = GetNetStats()
+		local latencyHome, latencyWorld
+		if C_Net then
+			latencyHome = C_Net.GetHomeLatency() or 0
+			latencyWorld = C_Net.GetWorldLatency() or 0
+		else
+			local _, _, h, w = GetNetStats()
+			latencyHome, latencyWorld = h or 0, w or 0
+		end
 
 		if db.homeping then
 			local latencyText = formatValue(latencyHome, LagBar_GetThresholdHexColor(latencyHome, unpack(PING_THRESHOLDS)), metricMs)
